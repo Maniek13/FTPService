@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FTPServiceTests.Domain.Controllers
+namespace FTPServiceTests.Domain.Controllers.WebControllers
 {
     public class FilesWebControllerTests
     {
