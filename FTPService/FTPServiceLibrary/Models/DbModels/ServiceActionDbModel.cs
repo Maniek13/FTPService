@@ -9,7 +9,7 @@ namespace FTPServiceLibrary.Models.DbModels
         [Required]
         public int ServiceId { get; set; }
         [Required]
-        public string Name { get; set; }
+        public string ActionName { get; set; }
         [Required]
         public string Path { get; set; }
         public ServicesPermisionsDbModel ServicesPermisions { get; set; }

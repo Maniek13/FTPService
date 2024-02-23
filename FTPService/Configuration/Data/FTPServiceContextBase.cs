@@ -42,6 +42,7 @@ namespace Configuration.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ServicesPermisionsDbModel>().HasIndex(u => u.ServiceName).IsUnique();
+            modelBuilder.Entity<ServiceActionDbModel>().HasIndex(u => u.Name).IsUnique();
 
             modelBuilder.Entity<ServicesPermisionsDbModel>()
                .HasOne<ConfigurationDbModel>(x => x.Configuration)
