@@ -8,7 +8,7 @@
         string Url { get; init; }
         string Damain { get; init; }
         string Login { get; init; }
-        string Port { get; init; }
+        int Port { get; init; }
         string Password { get; init; }
     }
 }

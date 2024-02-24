@@ -18,7 +18,7 @@ namespace FTPServiceLibrary.Interfaces.Models.DbModels
         [Required]
         string Password { get; set; }
         [Required]
-        string Port { get; init; }
+        int Port { get; init; }
         [Required]
         string Damain { get; init; }
         ServicesPermisionsDbModel ServicesPermisions { get; set; }

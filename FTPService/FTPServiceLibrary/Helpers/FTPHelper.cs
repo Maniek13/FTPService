@@ -1,54 +1,86 @@
-﻿using Azure.Core;
+﻿using FluentFTP;
 using FTPServiceLibrary.Interfaces.Models;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FTPServiceLibrary.Helpers
 {
     public class FTPHelper
     {
-        public static async Task SendFile(IFTPConfiguration cfg, string path, IFormFile files)
+        // path: /serviceName/actionName
+        public static async Task SendFile(IFTPConfiguration cfg, string serviceName, string actionName, IFormFile file)
+        {
+            string tempPath = AppDomain.CurrentDomain.BaseDirectory + "\\" + serviceName + "\\" + actionName;
+            string fullPath = tempPath + "\\" + file.FileName;
+            try
+            {
+                using (var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port))
+                {
+                    await ftp.Connect();
+                    Directory.CreateDirectory(tempPath);
+
+                    using (Stream fileStream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+
+                    await ftp.UploadFile(fullPath, serviceName + "//" + actionName + "//" + file.FileName, FtpRemoteExists.Overwrite, true);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+            finally
+            {
+                File.Delete(fullPath);
+            }
+        }
+        public static async Task<IFormFile> GetFile(IFTPConfiguration cfg, string serviceName, string actionName, string fileName)
+        {
+            string tempPath = AppDomain.CurrentDomain.BaseDirectory + "\\" + serviceName + "\\" + actionName;
+            string fullPath = tempPath + "\\" + fileName;
+
+            try
+            {
+                var token = new CancellationToken();
+
+                using (var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port))
+                {
+                    await ftp.Connect(token);
+                    await ftp.DownloadFile(fullPath, serviceName + "//" + actionName + "//" + fileName, token: token);
+                }
+
+
+                using (var stream = File.OpenRead(fullPath))
+                {
+                    return new FormFile(stream, 0, stream.Length, null, Path.GetFileName(stream.Name))
+                    {
+                        Headers = new HeaderDictionary()
+                    };
+                }
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+            finally
+            {
+                File.Delete(fullPath);
+            }
+        }
+
+        public static async Task DeleteFile(IFTPConfiguration cfg, string serviceName, string actionName, string fileName)
         {
             try
             {
-                FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{cfg.Url}{path}");
-                request.Method = WebRequestMethods.Ftp.UploadFile;
-                request.Credentials = new NetworkCredential()
-                {
-                    UserName = cfg.Name, Password = cfg.Password, Domain = cfg.Damain
-                };
+                var token = new CancellationToken();
 
-                var temp = files.OpenReadStream();
-                byte[] byteArray;
-
-                using (MemoryStream ms = new())
+                using (var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port))
                 {
-                    ms.Position = 0;
-                    temp.CopyTo(ms);
-                    byteArray = ms.ToArray();
+                    await ftp.Connect(token);
+                    await ftp.DeleteFile(serviceName + "//" + actionName + "//" + fileName, token: token);
                 }
-                using (MemoryStream fileStream = new ())
-                {
-                    fileStream.Write(byteArray, 0, byteArray.Length);
-                    fileStream.Seek(0, SeekOrigin.Begin);
-
-                    using (Stream requestStream = request.GetRequestStream())
-                    {
-                        await fileStream.CopyToAsync(requestStream);
-                        using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
-                        {
-                            if (response.StatusCode != FtpStatusCode.CommandOK)
-                                throw new Exception("Plik nie został wstawiony");
-                        }
-                    }
-                }
-                
-            
             }
             catch (Exception e)
             {
