@@ -2,18 +2,18 @@
 using FTPServiceLibrary.Interfaces.Data;
 using FTPServiceLibrary.Interfaces.DbControllers;
 using FTPServiceLibrary.Interfaces.Models.DbModels;
+using FTPServiceLibrary.Models;
 using FTPServiceLibrary.Models.DbModels;
 
 namespace Configuration.Controllers.DbControllers
 {
-    public class FTPRODbController(IFTPServiceContextBase dbContext) : IFTPRODbController
+    public class FTPRODbController() : IFTPRODbController
     {
-        private readonly IFTPServiceContextBase _context = dbContext;
-
         public ServicesPermisionsDbModel GetPermision(string serviceName)
         {
             try
             {
+                using FTPServiceContextRO _context = new FTPServiceContextRO(AppConfig.ConnectionStringRO);
                 return _context.ServicesPermisions.Where(el => el.ServiceName == serviceName).FirstOrDefault();
             }
             catch (Exception ex)
@@ -26,7 +26,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                return _context.Configurations.Where(el => el.ServiceId == serviceId).FirstOrDefault();
+                using FTPServiceContextRO _context = new FTPServiceContextRO(AppConfig.ConnectionStringRO);
+                return _context.FtpConfigurations.Where(el => el.ServiceId == serviceId).FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -38,7 +39,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                return [.. _context.ServicesActions.Where(el => el.ServiceId == serviceId)];
+                using FTPServiceContextRO _context = new FTPServiceContextRO(AppConfig.ConnectionStringRO);
+                return [.. _context.FtpServicesActions.Where(el => el.ServiceId == serviceId)];
             }
             catch (Exception ex)
             {
@@ -50,7 +52,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                return _context.ServicesActions.Where(el => el.ServiceId == serviceId && el.ActionName == actionName).FirstOrDefault();
+                using FTPServiceContextRO _context = new FTPServiceContextRO(AppConfig.ConnectionStringRO);
+                return _context.FtpServicesActions.Where(el => el.ServiceId == serviceId && el.ActionName == actionName).FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -61,7 +64,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                return _context.ServicesActions.Where(el => el.Id == actionId).FirstOrDefault();
+                using FTPServiceContextRO _context = new FTPServiceContextRO(AppConfig.ConnectionStringRO);
+                return _context.FtpServicesActions.Where(el => el.Id == actionId).FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -72,7 +76,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                return _context.Files.Where(el => el.Id == id).FirstOrDefault();
+                using FTPServiceContextRO _context = new FTPServiceContextRO(AppConfig.ConnectionStringRO);
+                return _context.FtpFiles.Where(el => el.Id == id).FirstOrDefault();
 
             }
             catch (Exception ex)
@@ -84,7 +89,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                return [.. _context.Files.Where(el => el.ServiceActionId == actionId)];
+                using FTPServiceContextRO _context = new FTPServiceContextRO(AppConfig.ConnectionStringRO);
+                return [.. _context.FtpFiles.Where(el => el.ServiceActionId == actionId)];
 
             }
             catch (Exception ex)

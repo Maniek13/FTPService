@@ -2,19 +2,19 @@
 using FTPServiceLibrary.Interfaces.Data;
 using FTPServiceLibrary.Interfaces.DbControllers;
 using FTPServiceLibrary.Interfaces.Models.DbModels;
+using FTPServiceLibrary.Models;
 using FTPServiceLibrary.Models.DbModels;
 
 namespace Configuration.Controllers.DbControllers
 {
-    public class FTPDbController(IFTPServiceContextBase dbContext) : IFTPDbController
+    public class FTPDbController() : IFTPDbController
     {
-        readonly IFTPServiceContextBase _context = dbContext;
-        
         public async Task<IConfigurationDbModel> SetFTPConfigurationAsync(IConfigurationDbModel cfg)
         {
             try
             {
-                await _context.Configurations.AddAsync((ConfigurationDbModel)cfg);
+                using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
+                await _context.FtpConfigurations.AddAsync((ConfigurationDbModel)cfg);
                 await _context.SaveChangesAsync();
                 return cfg;
 
@@ -28,7 +28,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                _context.Configurations.Update((ConfigurationDbModel)cfg);
+                using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
+                _context.FtpConfigurations.Update((ConfigurationDbModel)cfg);
                 await _context.SaveChangesAsync();
                 return cfg;
 
@@ -42,8 +43,9 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                var temp = _context.Configurations.Where(el => el.ServiceId == serviceId).FirstOrDefault();
-                _context.Configurations.Remove(temp);
+                using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
+                var temp = _context.FtpConfigurations.Where(el => el.ServiceId == serviceId).FirstOrDefault();
+                _context.FtpConfigurations.Remove(temp);
                 await _context.SaveChangesAsync();
 
             }
@@ -57,7 +59,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                await _context.ServicesActions.AddAsync((ServiceActionDbModel)action);
+                using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
+                await _context.FtpServicesActions.AddAsync((ServiceActionDbModel)action);
                 await _context.SaveChangesAsync();
                 return action;
 
@@ -72,7 +75,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                _context.ServicesActions.Update((ServiceActionDbModel)action);
+                using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
+                _context.FtpServicesActions.Update((ServiceActionDbModel)action);
                 await _context.SaveChangesAsync();
                 return action;
 
@@ -86,8 +90,9 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                var temp = _context.ServicesActions.Where(el => el.ActionName == actionName).FirstOrDefault();
-                _context.ServicesActions.Remove(temp);
+                using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
+                var temp = _context.FtpServicesActions.Where(el => el.ActionName == actionName).FirstOrDefault();
+                _context.FtpServicesActions.Remove(temp);
                 await _context.SaveChangesAsync();
 
             }
@@ -101,7 +106,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                await _context.Files.AddAsync((FilesDbModel)file);
+                using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
+                await _context.FtpFiles.AddAsync((FilesDbModel)file);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -114,8 +120,9 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                var file = _context.Files.Where(el => el.Id == id).FirstOrDefault();
-                _context.Files.Remove(file);
+                using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
+                var file = _context.FtpFiles.Where(el => el.Id == id).FirstOrDefault();
+                _context.FtpFiles.Remove(file);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -128,8 +135,9 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                var file = _context.Files.Where(el => el.ServiceActionId == actionId && el.Name == fileName).FirstOrDefault();
-                _context.Files.Remove(file);
+                using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
+                var file = _context.FtpFiles.Where(el => el.ServiceActionId == actionId && el.Name == fileName).FirstOrDefault();
+                _context.FtpFiles.Remove(file);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
