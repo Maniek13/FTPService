@@ -38,7 +38,7 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                return _context.ServicesActions.Where(el => el.ServiceId == serviceId).ToList();
+                return [.. _context.ServicesActions.Where(el => el.ServiceId == serviceId)];
             }
             catch (Exception ex)
             {
@@ -46,5 +46,51 @@ namespace Configuration.Controllers.DbControllers
             }
         }
 
+        public ServiceActionDbModel GetServiceAction(int serviceId, string actionName)
+        {
+            try
+            {
+                return _context.ServicesActions.Where(el => el.ServiceId == serviceId && el.ActionName == actionName).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+        public ServiceActionDbModel GetServiceAction(int actionId)
+        {
+            try
+            {
+                return _context.ServicesActions.Where(el => el.Id == actionId).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+        public FilesDbModel GetFile(int id)
+        {
+            try
+            {
+                return _context.Files.Where(el => el.Id == id).FirstOrDefault();
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+        public List<FilesDbModel> GetActionFiles(int actionId)
+        {
+            try
+            {
+                return [.. _context.Files.Where(el => el.ServiceActionId == actionId)];
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
     }
 }

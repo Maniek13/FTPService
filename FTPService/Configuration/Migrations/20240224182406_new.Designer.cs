@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Configuration.Migrations
 {
     [DbContext(typeof(FTPServiceContextBase))]
-    [Migration("20240223212244_init")]
-    partial class init
+    [Migration("20240224182406_new")]
+    partial class @new
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,9 @@ namespace Configuration.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Port")
+                        .HasColumnType("int");
+
                     b.Property<int>("ServiceId")
                         .HasColumnType("int");
 
@@ -56,7 +59,7 @@ namespace Configuration.Migrations
                     b.HasIndex("ServiceId")
                         .IsUnique();
 
-                    b.ToTable("Configurations");
+                    b.ToTable("FtpConfigurations");
                 });
 
             modelBuilder.Entity("FTPServiceLibrary.Models.DbModels.FilesDbModel", b =>
@@ -82,7 +85,7 @@ namespace Configuration.Migrations
 
                     b.HasIndex("ServiceActionId");
 
-                    b.ToTable("Files");
+                    b.ToTable("FtpFiles");
                 });
 
             modelBuilder.Entity("FTPServiceLibrary.Models.DbModels.ServiceActionDbModel", b =>
@@ -93,9 +96,9 @@ namespace Configuration.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("ActionName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Path")
                         .IsRequired()
@@ -106,9 +109,12 @@ namespace Configuration.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ActionName")
+                        .IsUnique();
+
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("ServicesActions");
+                    b.ToTable("FtpServicesActions");
                 });
 
             modelBuilder.Entity("FTPServiceLibrary.Models.DbModels.ServicesPermisionsDbModel", b =>

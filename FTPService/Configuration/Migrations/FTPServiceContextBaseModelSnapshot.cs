@@ -29,10 +29,6 @@ namespace Configuration.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Damain")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Login")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -45,9 +41,8 @@ namespace Configuration.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Port")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Port")
+                        .HasColumnType("int");
 
                     b.Property<int>("ServiceId")
                         .HasColumnType("int");
@@ -61,7 +56,7 @@ namespace Configuration.Migrations
                     b.HasIndex("ServiceId")
                         .IsUnique();
 
-                    b.ToTable("Configurations");
+                    b.ToTable("FtpConfigurations");
                 });
 
             modelBuilder.Entity("FTPServiceLibrary.Models.DbModels.FilesDbModel", b =>
@@ -87,7 +82,7 @@ namespace Configuration.Migrations
 
                     b.HasIndex("ServiceActionId");
 
-                    b.ToTable("Files");
+                    b.ToTable("FtpFiles");
                 });
 
             modelBuilder.Entity("FTPServiceLibrary.Models.DbModels.ServiceActionDbModel", b =>
@@ -116,7 +111,7 @@ namespace Configuration.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("ServicesActions");
+                    b.ToTable("FtpServicesActions");
                 });
 
             modelBuilder.Entity("FTPServiceLibrary.Models.DbModels.ServicesPermisionsDbModel", b =>

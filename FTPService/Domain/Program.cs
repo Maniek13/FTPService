@@ -1,3 +1,6 @@
+using Configuration.Controllers.DbControllers;
+using Configuration.Data;
+using Domain.Controllers.WebControllers;
 using FTPServiceLibrary.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -38,5 +41,26 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+FilesWebController filesWebController = new(app.Logger, new FTPRODbController(new FTPServiceContextRO(AppConfig.ConnectionStringRO)), new FTPDbController(new FTPServiceContext(AppConfig.ConnectionString)));
+app.MapGet("/SendFileAsync", filesWebController.SendFileAsync)
+    .WithDescription("Wysy³anie pliku")
+    .WithOpenApi();
+
+app.MapPost("/GetFileAsync", filesWebController.GetFileAsync)
+    .WithDescription("Pobieranie pliku")
+    .WithOpenApi();
+
+app.MapPut("/GetFilesAsync", filesWebController.GetFilesAsync)
+    .WithDescription("Pobieranie plików akcji")
+    .WithOpenApi();
+
+app.MapDelete("/DeleteFile", filesWebController.DeleteFile)
+    .WithDescription("Usuwanie pliku")
+    .WithOpenApi();
+
+app.MapDelete("/DeleteAllActionsFiles", filesWebController.DeleteAllActionsFiles)
+    .WithDescription("Usuwanie wszytskich plików akcji")
+    .WithOpenApi();
 
 app.Run();

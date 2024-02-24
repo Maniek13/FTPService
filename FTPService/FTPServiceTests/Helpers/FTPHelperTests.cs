@@ -24,15 +24,15 @@ namespace FTPServiceTests.Helpers
                     Password = "12345678"
                 };
 
-                using (var stream = File.OpenRead("C:\\Users\\mani3\\OneDrive\\Pulpit\\Praca\\1234.jpg"))
+                using var stream = File.OpenRead("C:\\Users\\mani3\\OneDrive\\Pulpit\\Praca\\1234.jpg");
+                
+                var file = new FormFile(stream, 0, stream.Length, null, Path.GetFileName(stream.Name))
                 {
-                    var file = new FormFile(stream, 0, stream.Length, null, Path.GetFileName(stream.Name))
-                    {
-                        Headers = new HeaderDictionary()
-                    };
+                    Headers = new HeaderDictionary()
+                };
 
-                    await FTPHelper.SendFile(cfg, "test", "akcja", file);
-                }
+                await FTPHelper.SendFile(cfg, "test", "akcja", file);
+                
                 
             }
             catch(Exception ex)

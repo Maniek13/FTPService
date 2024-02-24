@@ -14,18 +14,16 @@ namespace FTPServiceLibrary.Helpers
             try
             {
                 var token = new CancellationToken();
-                using (var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port))
+                using var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port);
+                await ftp.Connect(token);
+                Directory.CreateDirectory(tempPath);
+
+                using (Stream fileStream = new FileStream(fullPath, FileMode.Create))
                 {
-                    await ftp.Connect(token);
-                    Directory.CreateDirectory(tempPath);
-
-                    using (Stream fileStream = new FileStream(fullPath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(fileStream);
-                    }
-
-                    await ftp.UploadFile(fullPath, serviceName + "//" + actionName + "//" + file.FileName, FtpRemoteExists.Overwrite, true, token: token);
+                    await file.CopyToAsync(fileStream);
                 }
+
+                await ftp.UploadFile(fullPath, serviceName + "//" + actionName + "//" + file.FileName, FtpRemoteExists.Overwrite, true, token: token);
             }
             catch (Exception e)
             {
@@ -52,13 +50,11 @@ namespace FTPServiceLibrary.Helpers
                 }
 
 
-                using (var stream = File.OpenRead(fullPath))
+                using var stream = File.OpenRead(fullPath);
+                return new FormFile(stream, 0, stream.Length, null, Path.GetFileName(stream.Name))
                 {
-                    return new FormFile(stream, 0, stream.Length, null, Path.GetFileName(stream.Name))
-                    {
-                        Headers = new HeaderDictionary()
-                    };
-                }
+                    Headers = new HeaderDictionary()
+                };
 
             }
             catch (Exception e)
@@ -76,11 +72,9 @@ namespace FTPServiceLibrary.Helpers
             try
             {
                 var token = new CancellationToken();
-                using (var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port))
-                {
-                    await ftp.Connect(token);
-                    await ftp.DeleteFile(serviceName + "//" + actionName + "//" + fileName, token: token);
-                }
+                using AsyncFtpClient ftp = new(cfg.Url, cfg.Login, cfg.Password, cfg.Port);
+                await ftp.Connect(token);
+                await ftp.DeleteFile(serviceName + "//" + actionName + "//" + fileName, token: token);
             }
             catch (Exception e)
             {
@@ -93,11 +87,9 @@ namespace FTPServiceLibrary.Helpers
             try
             {
                 var token = new CancellationToken();
-                using (var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port))
-                {
-                    await ftp.Connect(token);
-                    await ftp.DeleteDirectory(serviceName + "//" + actionName, token: token);
-                }
+                using var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port);
+                await ftp.Connect(token);
+                await ftp.DeleteDirectory(serviceName + "//" + actionName, token: token);
             }
             catch (Exception e)
             {

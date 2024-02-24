@@ -66,8 +66,8 @@ namespace Configuration.Data
         }
 
         public virtual DbSet<ServicesPermisionsDbModel> ServicesPermisions { get; set; }
-        public virtual DbSet<FilesDbModel> Files  {get; set;}
-        public virtual DbSet<ServiceActionDbModel> ServicesActions {  get; set; }
-        public virtual DbSet<ConfigurationDbModel> Configurations { get; set;}
+        public virtual DbSet<FilesDbModel> FtpFiles  {get; set;}
+        public virtual DbSet<ServiceActionDbModel> FtpServicesActions {  get; set; }
+        public virtual DbSet<ConfigurationDbModel> FtpConfigurations { get; set;}
     }
 }

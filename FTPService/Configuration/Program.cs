@@ -1,7 +1,5 @@
 using Configuration.Controllers.DbControllers;
 using Configuration.Data;
-using FTPServiceLibrary.Interfaces.Data;
-using FTPServiceLibrary.Interfaces.DbControllers;
 using FTPServiceLibrary.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;

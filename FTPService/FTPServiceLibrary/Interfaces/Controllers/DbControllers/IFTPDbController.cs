@@ -1,6 +1,5 @@
 ﻿using FTPServiceLibrary.Interfaces.Models.DbModels;
 using FTPServiceLibrary.Models.DbModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace FTPServiceLibrary.Interfaces.DbControllers
 {
@@ -12,5 +11,8 @@ namespace FTPServiceLibrary.Interfaces.DbControllers
         Task<IServiceActionDbModel> AddActionFolderAsync(IServiceActionDbModel action);
         Task<IServiceActionDbModel> EditActionFolderAsync(IServiceActionDbModel action);
         Task RemoveActionFolderAsync(string actionName);
+        Task AddFile(IFilesDbModel file);
+        Task DeleteFile(int id);
+        Task DeleteFile(int actionId, string fileName);
     }
 }

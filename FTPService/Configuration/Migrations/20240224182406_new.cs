@@ -5,7 +5,7 @@
 namespace Configuration.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class @new : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,7 +24,7 @@ namespace Configuration.Migrations
             //    });
 
             migrationBuilder.CreateTable(
-                name: "Configurations",
+                name: "FtpConfigurations",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -33,13 +33,14 @@ namespace Configuration.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Login = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Port = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Configurations", x => x.Id);
+                    table.PrimaryKey("PK_FtpConfigurations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Configurations_ServicesPermisions_ServiceId",
+                        name: "FK_FtpConfigurations_ServicesPermisions_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "ServicesPermisions",
                         principalColumn: "Id",
@@ -47,20 +48,20 @@ namespace Configuration.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ServicesActions",
+                name: "FtpServicesActions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ServiceId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ActionName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Path = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServicesActions", x => x.Id);
+                    table.PrimaryKey("PK_FtpServicesActions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ServicesActions_ServicesPermisions_ServiceId",
+                        name: "FK_FtpServicesActions_ServicesPermisions_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "ServicesPermisions",
                         principalColumn: "Id",
@@ -68,7 +69,7 @@ namespace Configuration.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Files",
+                name: "FtpFiles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -79,29 +80,35 @@ namespace Configuration.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Files", x => x.Id);
+                    table.PrimaryKey("PK_FtpFiles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Files_ServicesActions_ServiceActionId",
+                        name: "FK_FtpFiles_FtpServicesActions_ServiceActionId",
                         column: x => x.ServiceActionId,
-                        principalTable: "ServicesActions",
+                        principalTable: "FtpServicesActions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Configurations_ServiceId",
-                table: "Configurations",
+                name: "IX_FtpConfigurations_ServiceId",
+                table: "FtpConfigurations",
                 column: "ServiceId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Files_ServiceActionId",
-                table: "Files",
+                name: "IX_FtpFiles_ServiceActionId",
+                table: "FtpFiles",
                 column: "ServiceActionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServicesActions_ServiceId",
-                table: "ServicesActions",
+                name: "IX_FtpServicesActions_ActionName",
+                table: "FtpServicesActions",
+                column: "ActionName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FtpServicesActions_ServiceId",
+                table: "FtpServicesActions",
                 column: "ServiceId");
 
             //migrationBuilder.CreateIndex(
@@ -115,13 +122,13 @@ namespace Configuration.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Configurations");
+                name: "FtpConfigurations");
 
             migrationBuilder.DropTable(
-                name: "Files");
+                name: "FtpFiles");
 
             migrationBuilder.DropTable(
-                name: "ServicesActions");
+                name: "FtpServicesActions");
 
             migrationBuilder.DropTable(
                 name: "ServicesPermisions");

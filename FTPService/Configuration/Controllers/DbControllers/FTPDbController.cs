@@ -96,5 +96,46 @@ namespace Configuration.Controllers.DbControllers
                 throw new Exception(ex.Message, ex);
             }
         }
+
+        public async Task AddFile(IFilesDbModel file)
+        {
+            try
+            {
+                await _context.Files.AddAsync((FilesDbModel)file);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+
+        public async Task DeleteFile(int id)
+        {
+            try
+            {
+                var file = _context.Files.Where(el => el.Id == id).FirstOrDefault();
+                _context.Files.Remove(file);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+
+        public async Task DeleteFile(int actionId, string fileName)
+        {
+            try
+            {
+                var file = _context.Files.Where(el => el.ServiceActionId == actionId && el.Name == fileName).FirstOrDefault();
+                _context.Files.Remove(file);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
     }
 }

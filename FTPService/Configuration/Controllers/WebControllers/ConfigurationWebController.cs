@@ -11,16 +11,16 @@ namespace Configuration.Controllers.DbControllers
 {
     internal class ConfigurationWebController(ILogger logger, IFTPRODbController fTPRODbController, IFTPDbController fTPDbController) : IConfigurationWebController
     {
-        ILogger _logger = logger;
-        IFTPRODbController _ftpRODbController = fTPRODbController;
-        IFTPDbController _ftpDbController = fTPDbController;
+        readonly ILogger _logger = logger;
+        readonly IFTPRODbController _ftpRODbController = fTPRODbController;
+        readonly IFTPDbController _ftpDbController = fTPDbController;
 
         public IResponseModel<FTPConfiguration> GetConfiguration(string serviceName, HttpContext context)
         {
             try
             {
-                var permision = _ftpRODbController.GetPermision(serviceName);
-                var cfgDb = _ftpRODbController.GetFTPConfiguration(permision.Id);
+                var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
+                var cfgDb = _ftpRODbController.GetFTPConfiguration(permisions.Id);
                 var config = ConversionHelper.ConveretToFtpConfuguration(cfgDb);
 
 
@@ -45,8 +45,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                var permision = _ftpRODbController.GetPermision(serviceName);
-                cfg.ServiceId = permision.Id;
+                var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
+                cfg.ServiceId = permisions.Id;
                 var cfgDb = await _ftpDbController.SetFTPConfigurationAsync(ConversionHelper.ConveretToConfigurationDbModel(cfg));
                 var config = ConversionHelper.ConveretToFtpConfuguration(cfgDb);
 
@@ -72,7 +72,7 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                var permision = _ftpRODbController.GetPermision(serviceName);
+                _ = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var cfgDb = await _ftpDbController.EditFTPConfigurationAsync(ConversionHelper.ConveretToConfigurationDbModel(cfg));
 
                 return new ResponseModel<bool>()
@@ -97,8 +97,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                var permision = _ftpRODbController.GetPermision(serviceName);
-                await _ftpDbController.RemoveFTPConfigurationAsync(permision.Id);
+                var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
+                await _ftpDbController.RemoveFTPConfigurationAsync(permisions.Id);
 
                 return new ResponseModel<bool>()
                 {
@@ -122,8 +122,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                var permision = _ftpRODbController.GetPermision(serviceName);
-                var actionsDb = _ftpRODbController.GetServiceActions(permision.Id);
+                var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
+                var actionsDb = _ftpRODbController.GetServiceActions(permisions.Id);
 
 
                 List<ServicesAction> actions = [];
@@ -154,8 +154,8 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                var permision = _ftpRODbController.GetPermision(serviceName);
-                servicesAction.ServiceId = permision.Id;
+                var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
+                servicesAction.ServiceId = permisions.Id;
                 var actionsDb = await _ftpDbController.AddActionFolderAsync(ConversionHelper.ConvertToServiceActionDbModel(servicesAction));
 
 
@@ -180,7 +180,7 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                var permision = _ftpRODbController.GetPermision(serviceName);
+                _ = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var actionsDb = await _ftpDbController.EditActionFolderAsync(ConversionHelper.ConvertToServiceActionDbModel(servicesAction));
 
 
@@ -205,7 +205,7 @@ namespace Configuration.Controllers.DbControllers
         {
             try
             {
-                var permision = _ftpRODbController.GetPermision(serviceName);
+                _ = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 await _ftpDbController.RemoveActionFolderAsync(actionName);
 
                 return new ResponseModel<bool>()
