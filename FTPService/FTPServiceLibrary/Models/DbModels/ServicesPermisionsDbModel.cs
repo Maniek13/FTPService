@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FTPServiceLibrary.Interfaces.Models.DbModels;
+using System.ComponentModel.DataAnnotations;
 
 namespace FTPServiceLibrary.Models.DbModels
 {
-    public class ServicesPermisionsDbModel
+    public class ServicesPermisionsDbModel : IServicesPermisionsDbModel
     {
         [Key]
         public int Id { get; set; }
@@ -10,5 +11,6 @@ namespace FTPServiceLibrary.Models.DbModels
         public string ServiceName { get; set; }
         public ConfigurationDbModel Configuration { get; set; }
         public ICollection<ServiceActionDbModel> ServicesActions { get; set; }
+
     }
 }

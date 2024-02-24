@@ -33,6 +33,7 @@ namespace FTPServiceLibrary.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ServicesPermisionsDbModel>().HasIndex(u => u.ServiceName).IsUnique();
+            modelBuilder.Entity<ServiceActionDbModel>().HasIndex(u => u.ActionName).IsUnique();
 
             modelBuilder.Entity<ServicesPermisionsDbModel>()
                .HasOne<ConfigurationDbModel>(x => x.Configuration)

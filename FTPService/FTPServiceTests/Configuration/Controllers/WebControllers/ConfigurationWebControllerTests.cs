@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FTPServiceTests.Configuration.Controllers.WebControllers
 {
-    public class IConfigurationWebControllerTests
+    public class ConfigurationWebControllerTests
     {
         [Fact]
         public Task AddConfiguration() => throw new NotImplementedException();

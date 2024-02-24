@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FTPServiceLibrary.Interfaces.Models.DbModels;
+using System.ComponentModel.DataAnnotations;
 
 namespace FTPServiceLibrary.Models.DbModels
 {
-    public class ConfigurationDbModel
+    public class ConfigurationDbModel : IConfigurationDbModel
     {
         [Key]
         public int Id { get; set; }
@@ -16,6 +17,10 @@ namespace FTPServiceLibrary.Models.DbModels
         public string Login { get; set; }
         [Required]
         public string Password { get; set; }
+        [Required]
+        public string Port { get; init; }
+        [Required]
+        public string Damain { get; init; }
         public ServicesPermisionsDbModel ServicesPermisions { get; set; }
     }
 }

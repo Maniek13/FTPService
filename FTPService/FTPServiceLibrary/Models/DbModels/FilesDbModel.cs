@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FTPServiceLibrary.Interfaces.Models.DbModels;
+using System.ComponentModel.DataAnnotations;
 
 namespace FTPServiceLibrary.Models.DbModels
 {
-    public class FilesDbModel
+    public class FilesDbModel : IFilesDbModel
     {
         [Key]
         public int Id { get; set; }

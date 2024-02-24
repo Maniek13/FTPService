@@ -1,3 +1,7 @@
+using Configuration.Controllers.DbControllers;
+using Configuration.Data;
+using FTPServiceLibrary.Interfaces.Data;
+using FTPServiceLibrary.Interfaces.DbControllers;
 using FTPServiceLibrary.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -30,6 +34,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -39,5 +44,39 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
+
+ConfigurationWebController configurationWebController = new(app.Logger, new FTPRODbController(new FTPServiceContextRO(AppConfig.ConnectionStringRO)), new FTPDbController(new FTPServiceContext(AppConfig.ConnectionString)));
+app.MapGet("/GetConfiguration", configurationWebController.GetConfiguration)
+    .WithDescription("Get coonfiguration")
+    .WithOpenApi();
+
+app.MapPost("/SetConfiguration", configurationWebController.AddConfiguration)
+    .WithDescription("Set coonfiguration")
+    .WithOpenApi();
+
+app.MapPut("/UpdateConfiguration", configurationWebController.EditConfiguration)
+    .WithDescription("Update coonfiguration")
+    .WithOpenApi();
+
+app.MapDelete("/DeleteConfiguration", configurationWebController.DeleteConfiguration)
+    .WithDescription("Remove coonfiguration")
+    .WithOpenApi();
+
+app.MapGet("/GetActionsFolders", configurationWebController.GetActionsFolders)
+    .WithDescription("Get action folder")
+    .WithOpenApi();
+
+app.MapPost("/AddActionFolder", configurationWebController.AddActionFolder)
+    .WithDescription("Set action folder")
+    .WithOpenApi();
+
+app.MapPut("/UpdateActionFolder", configurationWebController.EditeActionFolder)
+    .WithDescription("Update action folder")
+    .WithOpenApi();
+
+app.MapDelete("/DeleteActionFolder", configurationWebController.DeleteActionFolder)
+    .WithDescription("Remove action folder")
+    .WithOpenApi();
 
 app.Run();
