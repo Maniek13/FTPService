@@ -13,9 +13,10 @@ namespace FTPServiceLibrary.Helpers
             string fullPath = tempPath + "\\" + file.FileName;
             try
             {
+                var token = new CancellationToken();
                 using (var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port))
                 {
-                    await ftp.Connect();
+                    await ftp.Connect(token);
                     Directory.CreateDirectory(tempPath);
 
                     using (Stream fileStream = new FileStream(fullPath, FileMode.Create))
@@ -23,7 +24,7 @@ namespace FTPServiceLibrary.Helpers
                         await file.CopyToAsync(fileStream);
                     }
 
-                    await ftp.UploadFile(fullPath, serviceName + "//" + actionName + "//" + file.FileName, FtpRemoteExists.Overwrite, true);
+                    await ftp.UploadFile(fullPath, serviceName + "//" + actionName + "//" + file.FileName, FtpRemoteExists.Overwrite, true, token: token);
                 }
             }
             catch (Exception e)
@@ -75,11 +76,27 @@ namespace FTPServiceLibrary.Helpers
             try
             {
                 var token = new CancellationToken();
-
                 using (var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port))
                 {
                     await ftp.Connect(token);
                     await ftp.DeleteFile(serviceName + "//" + actionName + "//" + fileName, token: token);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public static async Task DeleteAllFiles(IFTPConfiguration cfg, string serviceName, string actionName)
+        {
+            try
+            {
+                var token = new CancellationToken();
+                using (var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port))
+                {
+                    await ftp.Connect(token);
+                    await ftp.DeleteDirectory(serviceName + "//" + actionName, token: token);
                 }
             }
             catch (Exception e)

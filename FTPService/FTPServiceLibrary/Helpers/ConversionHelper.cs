@@ -22,8 +22,7 @@ namespace FTPServiceLibrary.Helpers
                 Url = cfg.Url,
                 Login = cfg.Login,
                 Password = cfg.Password,
-                Port = cfg.Port,
-                Damain = cfg.Damain,
+                Port = cfg.Port
             };
         }
 
@@ -37,8 +36,7 @@ namespace FTPServiceLibrary.Helpers
                 Url = cfg.Url,
                 Login = cfg.Login,
                 Password = cfg.Password,
-                Port = cfg.Port,
-                Damain = cfg.Damain,
+                Port = cfg.Port
             };
         }
 

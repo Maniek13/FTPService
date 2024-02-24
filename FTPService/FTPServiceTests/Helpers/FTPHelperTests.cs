@@ -71,12 +71,10 @@ namespace FTPServiceTests.Helpers
 
 
         [Fact]
-        public async Task DeleteFiles()
+        public async Task DeleteFile()
         {
             try
             {
-
-                
                 FTPConfiguration cfg = new()
                 {
                     Url = "127.0.0.1",
@@ -87,16 +85,35 @@ namespace FTPServiceTests.Helpers
 
 
                 await FTPHelper.DeleteFile(cfg, "test", "akcja", "1234.jpg");
-
                 Assert.ThrowsAsync<Exception>(async () => await FTPHelper.GetFile(cfg, "test", "akcja", "1234.jpg"));
-
-
             }
             catch (Exception ex)
             {
                 Assert.Fail(ex.ToString());
             }
+        }
 
+        [Fact]
+        public async Task DeleteAllActionFiles()
+        {
+            try
+            {
+                FTPConfiguration cfg = new()
+                {
+                    Url = "127.0.0.1",
+                    Port = 245,
+                    Login = "test",
+                    Password = "12345678"
+                };
+
+
+                await FTPHelper.DeleteAllFiles(cfg, "test", "akcja");
+                Assert.ThrowsAsync<Exception>(async () => await FTPHelper.GetFile(cfg, "test", "akcja", "1234.jpg"));
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.ToString());
+            }
         }
     }
 }
