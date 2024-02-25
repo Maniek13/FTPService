@@ -44,7 +44,7 @@ app.UseAuthorization();
 
 
 
-ConfigurationWebController configurationWebController = new(app.Logger, new FTPRODbController(new FTPServiceContextRO(AppConfig.ConnectionStringRO)), new FTPDbController(new FTPServiceContext(AppConfig.ConnectionString)));
+ConfigurationWebController configurationWebController = new(app.Logger, new FTPRODbController(), new FTPDbController());
 app.MapGet("/GetConfiguration", configurationWebController.GetConfiguration)
     .WithDescription("Get coonfiguration")
     .WithOpenApi();

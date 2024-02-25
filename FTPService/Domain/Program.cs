@@ -42,7 +42,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-FilesWebController filesWebController = new(app.Logger, new FTPRODbController(new FTPServiceContextRO(AppConfig.ConnectionStringRO)), new FTPDbController(new FTPServiceContext(AppConfig.ConnectionString)));
+FilesWebController filesWebController = new(app.Logger, new FTPRODbController(), new FTPDbController());
 app.MapGet("/SendFileAsync", filesWebController.SendFileAsync)
     .WithDescription("Wysy³anie pliku")
     .WithOpenApi();
