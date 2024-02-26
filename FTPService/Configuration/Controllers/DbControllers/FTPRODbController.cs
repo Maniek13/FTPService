@@ -1,7 +1,5 @@
 ﻿using Configuration.Data;
-using FTPServiceLibrary.Interfaces.Data;
 using FTPServiceLibrary.Interfaces.DbControllers;
-using FTPServiceLibrary.Interfaces.Models.DbModels;
 using FTPServiceLibrary.Models;
 using FTPServiceLibrary.Models.DbModels;
 

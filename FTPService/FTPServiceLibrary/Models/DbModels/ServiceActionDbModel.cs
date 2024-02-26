@@ -2,7 +2,7 @@
 
 namespace FTPServiceLibrary.Models.DbModels
 {
-    public class ServiceActionDbModel : IServiceActionDbModel
+    public record ServiceActionDbModel : IServiceActionDbModel
     {
         [Key]
         public int Id { get; set; }

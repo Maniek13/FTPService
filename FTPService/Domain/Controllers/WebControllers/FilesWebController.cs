@@ -57,6 +57,8 @@ namespace Domain.Controllers.WebControllers
             try
             {
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
+                throw new NotImplementedException();
+
                 return new ResponseModel<FormFileCollection>()
                 {
                     Data = null,
