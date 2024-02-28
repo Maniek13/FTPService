@@ -1,6 +1,8 @@
+using AutoMapper;
 using Configuration.Controllers.DbControllers;
 using Configuration.Data;
 using Domain.Controllers.WebControllers;
+using FTPServiceLibrary.Helpers;
 using FTPServiceLibrary.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +20,14 @@ AppConfig.ConnectionStringRO = config.GetSection("AppConfig").GetSection("ReadOn
 AppConfig.ConnectionString = config.GetSection("AppConfig").GetSection("Connection").Value;
 
 var builder = WebApplication.CreateBuilder(args);
+var mapperConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new AutoMapperProfile());
+});
+IMapper mapper = mapperConfig.CreateMapper();
+
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -42,8 +52,8 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-FilesWebController filesWebController = new(app.Logger, new FTPRODbController(), new FTPDbController());
-app.MapGet("/SendFileAsync", filesWebController.SendFileAsync)
+FilesWebController filesWebController = new(mapper, app.Logger, new FTPRODbController(), new FTPDbController());
+app.MapGet("/SendFileAsync", filesWebController.SendFilesAsync)
     .WithDescription("Wysy³anie pliku")
     .WithOpenApi();
 

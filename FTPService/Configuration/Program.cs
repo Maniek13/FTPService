@@ -1,3 +1,4 @@
+using AutoMapper;
 using Configuration.Controllers.DbControllers;
 using Configuration.Data;
 using FTPServiceLibrary.Models;
@@ -17,6 +18,13 @@ AppConfig.ConnectionStringRO = config.GetSection("AppConfig").GetSection("ReadOn
 AppConfig.ConnectionString = config.GetSection("AppConfig").GetSection("Connection").Value;
 
 var builder = WebApplication.CreateBuilder(args);
+var mapperConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new AutoMapperProfile());
+});
+IMapper mapper = mapperConfig.CreateMapper();
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -44,7 +52,7 @@ app.UseAuthorization();
 
 
 
-ConfigurationWebController configurationWebController = new(app.Logger, new FTPRODbController(), new FTPDbController());
+ConfigurationWebController configurationWebController = new(mapper, app.Logger, new FTPRODbController(), new FTPDbController());
 app.MapGet("/GetConfiguration", configurationWebController.GetConfiguration)
     .WithDescription("Get coonfiguration")
     .WithOpenApi();
