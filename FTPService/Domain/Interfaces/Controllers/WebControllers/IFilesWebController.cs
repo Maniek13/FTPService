@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using FTPServiceLibrary.Interfaces.Models;
+﻿using FTPServiceLibrary.Interfaces.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Domain.Interfaces.Controllers.WebControllers
 {

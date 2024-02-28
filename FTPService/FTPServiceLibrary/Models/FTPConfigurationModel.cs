@@ -1,6 +1,6 @@
 ﻿namespace FTPServiceLibrary.Interfaces.Models
 {
-    public record FTPConfiguration : IFTPConfiguration
+    public record FTPConfigurationModel : IFTPConfigurationModel
     {
         public int Id { get; init; }
         public int ServiceId { get; set; }

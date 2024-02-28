@@ -5,8 +5,8 @@ namespace FTPServiceLibrary.Interfaces.DbControllers
 {
     public interface IFTPDbController
     {
-        Task<IConfigurationDbModel> SetFTPConfigurationAsync(IConfigurationDbModel cfg);
-        Task<IConfigurationDbModel> EditFTPConfigurationAsync(IConfigurationDbModel cfg);
+        Task<IFTPConfigurationDbModel> SetFTPConfigurationAsync(IFTPConfigurationDbModel cfg);
+        Task<IFTPConfigurationDbModel> EditFTPConfigurationAsync(IFTPConfigurationDbModel cfg);
         Task RemoveFTPConfigurationAsync(int serviceId);
         Task<IServiceActionDbModel> AddActionFolderAsync(IServiceActionDbModel action);
         Task<IServiceActionDbModel> EditActionFolderAsync(IServiceActionDbModel action);

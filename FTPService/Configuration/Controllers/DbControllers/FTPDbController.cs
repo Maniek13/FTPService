@@ -1,5 +1,4 @@
 ﻿using Configuration.Data;
-using FTPServiceLibrary.Interfaces.Data;
 using FTPServiceLibrary.Interfaces.DbControllers;
 using FTPServiceLibrary.Interfaces.Models.DbModels;
 using FTPServiceLibrary.Models;
@@ -9,27 +8,27 @@ namespace Configuration.Controllers.DbControllers
 {
     public class FTPDbController() : IFTPDbController
     {
-        public async Task<IConfigurationDbModel> SetFTPConfigurationAsync(IConfigurationDbModel cfg)
+        public async Task<IFTPConfigurationDbModel> SetFTPConfigurationAsync(IFTPConfigurationDbModel cfg)
         {
             try
             {
                 using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
-                await _context.FtpConfigurations.AddAsync((ConfigurationDbModel)cfg);
+                await _context.FtpConfigurations.AddAsync((FTPConfigurationDbModel)cfg);
                 await _context.SaveChangesAsync();
                 return cfg;
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message, ex);
             }
         }
-        public async Task<IConfigurationDbModel> EditFTPConfigurationAsync(IConfigurationDbModel cfg)
+        public async Task<IFTPConfigurationDbModel> EditFTPConfigurationAsync(IFTPConfigurationDbModel cfg)
         {
             try
             {
                 using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
-                _context.FtpConfigurations.Update((ConfigurationDbModel)cfg);
+                _context.FtpConfigurations.Update((FTPConfigurationDbModel)cfg);
                 await _context.SaveChangesAsync();
                 return cfg;
 

@@ -1,6 +1,5 @@
 using AutoMapper;
 using Configuration.Controllers.DbControllers;
-using Configuration.Data;
 using Domain.Controllers.WebControllers;
 using FTPServiceLibrary.Helpers;
 using FTPServiceLibrary.Models;

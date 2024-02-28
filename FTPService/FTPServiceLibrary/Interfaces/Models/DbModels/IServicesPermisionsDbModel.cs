@@ -9,7 +9,7 @@ namespace FTPServiceLibrary.Interfaces.Models.DbModels
         int Id { get; set; }
         [Required]
         string ServiceName { get; set; }
-        ConfigurationDbModel Configuration { get; set; }
+        FTPConfigurationDbModel Configuration { get; set; }
         ICollection<ServiceActionDbModel> ServicesActions { get; set; }
     }
 }

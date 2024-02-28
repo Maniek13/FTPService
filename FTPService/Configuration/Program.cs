@@ -1,6 +1,6 @@
 using AutoMapper;
 using Configuration.Controllers.DbControllers;
-using Configuration.Data;
+using FTPServiceLibrary.Helpers;
 using FTPServiceLibrary.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;

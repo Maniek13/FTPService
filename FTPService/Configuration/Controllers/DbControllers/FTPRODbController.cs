@@ -20,7 +20,7 @@ namespace Configuration.Controllers.DbControllers
             }
         }
 
-        public ConfigurationDbModel GetFTPConfiguration(int serviceId)
+        public FTPConfigurationDbModel GetFTPConfiguration(int serviceId)
         {
             try
             {

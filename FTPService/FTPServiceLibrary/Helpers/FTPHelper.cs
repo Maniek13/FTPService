@@ -7,7 +7,7 @@ namespace FTPServiceLibrary.Helpers
     public class FTPHelper
     {
         // path: /serviceName/actionName
-        public static async Task SendFile(IFTPConfiguration cfg, string serviceName, string actionName, IFormFile file)
+        public static async Task SendFile(IFTPConfigurationModel cfg, string serviceName, string actionName, IFormFile file)
         {
             string tempPath = AppDomain.CurrentDomain.BaseDirectory + "\\" + serviceName + "\\" + actionName;
             string fullPath = tempPath + "\\" + file.FileName;
@@ -34,7 +34,7 @@ namespace FTPServiceLibrary.Helpers
                 File.Delete(fullPath);
             }
         }
-        public static async Task<IFormFile> GetFile(IFTPConfiguration cfg, string serviceName, string actionName, string fileName)
+        public static async Task<IFormFile> GetFile(IFTPConfigurationModel cfg, string serviceName, string actionName, string fileName)
         {
             string tempPath = AppDomain.CurrentDomain.BaseDirectory + "\\" + serviceName + "\\" + actionName;
             string fullPath = tempPath + "\\" + fileName;
@@ -67,7 +67,7 @@ namespace FTPServiceLibrary.Helpers
             }
         }
 
-        public static async Task DeleteFile(IFTPConfiguration cfg, string serviceName, string actionName, string fileName)
+        public static async Task DeleteFile(IFTPConfigurationModel cfg, string serviceName, string actionName, string fileName)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace FTPServiceLibrary.Helpers
             }
         }
 
-        public static async Task DeleteAllFiles(IFTPConfiguration cfg, string serviceName, string actionName)
+        public static async Task DeleteAllFiles(IFTPConfigurationModel cfg, string serviceName, string actionName)
         {
             try
             {

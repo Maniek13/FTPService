@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FTPServiceLibrary.Interfaces.Models
+﻿namespace FTPServiceLibrary.Interfaces.Models
 {
-    public interface IServicesAction
+    public interface IServiceActionModel
     {
         int Id { get; set; }
         int ServiceId { get; set; }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FTPServiceLibrary.Interfaces.Models.DbModels
 {
-    public interface IConfigurationDbModel
+    public interface IFTPConfigurationDbModel
     {
         [Key]
         int Id { get; set; }

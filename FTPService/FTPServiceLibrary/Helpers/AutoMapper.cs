@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using FTPServiceLibrary.Interfaces.Models;
-using FTPServiceLibrary.Interfaces.Models.DbModels;
 using FTPServiceLibrary.Models;
 using FTPServiceLibrary.Models.DbModels;
 

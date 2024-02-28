@@ -8,6 +8,6 @@ namespace FTPServiceLibrary.Interfaces.Data
         virtual DbSet<ServicesPermisionsDbModel> ServicesPermisions => throw new NotImplementedException();
         virtual DbSet<FilesDbModel> Files => throw new NotImplementedException();
         virtual DbSet<ServiceActionDbModel> ServicesActions => throw new NotImplementedException();
-        virtual DbSet<ConfigurationDbModel> Configurations => throw new NotImplementedException();
+        virtual DbSet<FTPConfigurationDbModel> Configurations => throw new NotImplementedException();
     }
 }

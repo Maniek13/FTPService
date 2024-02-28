@@ -20,15 +20,17 @@ namespace Domain.Controllers.WebControllers
         {
             try
             {
+                ValidationHelper.ValidateServiceName(serviceName);
+                ValidationHelper.ValidateActionName(actionName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
 
 
                 var action = _ftpRODbController.GetServiceAction(cfg.Id, actionName);
 
-                for(int i = 0; i<files.Count; ++i)
+                for (int i = 0; i < files.Count; ++i)
                 {
-                    await FTPHelper.SendFile(_mapper.Map<FTPConfiguration>(cfg), serviceName, actionName, files[i]);
+                    await FTPHelper.SendFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName, files[i]);
 
                     var file = new FilesDbModel()
                     {
@@ -46,7 +48,7 @@ namespace Domain.Controllers.WebControllers
                     Message = "ok",
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError($"{GetType()} : {ex.Message}");
                 return new ResponseModel<bool>()
@@ -56,12 +58,14 @@ namespace Domain.Controllers.WebControllers
                 };
             }
         }
-        public async Task<IResponseModel<FormFileCollection>> GetFilesAsync(string serviceName, string actionNam, HttpContext context)
+        public async Task<IResponseModel<FormFileCollection>> GetFilesAsync(string serviceName, string actionName, HttpContext context)
         {
             try
             {
+                ValidationHelper.ValidateServiceName(serviceName);
+                ValidationHelper.ValidateActionName(actionName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
-                var action = _ftpRODbController.GetServiceAction(permisions.Id, serviceName);
+                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
 
                 var filesInActionName = _ftpRODbController.GetActionFiles(action.Id);
@@ -70,7 +74,7 @@ namespace Domain.Controllers.WebControllers
 
                 if (filesInActionName != null)
                     for (int i = 0; i < filesInActionName.Count; ++i)
-                        files.Add(await FTPHelper.GetFile(_mapper.Map<FTPConfiguration>(cfg), serviceName, action.ActionName, filesInActionName[i].Name));
+                        files.Add(await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.ActionName, filesInActionName[i].Name));
 
 
                 return new ResponseModel<FormFileCollection>()
@@ -93,12 +97,15 @@ namespace Domain.Controllers.WebControllers
         {
             try
             {
+                ValidationHelper.ValidateServiceName(serviceName);
+                if (id <= 0)
+                    throw new Exception("Plik musi mieć id większe od zera");
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
                 var file = _ftpRODbController.GetFile(id);
                 var action = _ftpRODbController.GetServiceAction(file.ServiceActionId);
 
-                IFormFile f = await FTPHelper.GetFile(_mapper.Map<FTPConfiguration>(cfg), serviceName, action.ActionName, file.Name);
+                IFormFile f = await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.ActionName, file.Name);
 
                 return new ResponseModel<FormFile>()
                 {
@@ -120,15 +127,17 @@ namespace Domain.Controllers.WebControllers
         {
             try
             {
+                ValidationHelper.ValidateServiceName(serviceName);
+                ValidationHelper.ValidateActionName(actionName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
                 var action = _ftpRODbController.GetServiceAction(cfg.Id, actionName);
 
-                await FTPHelper.DeleteAllFiles(_mapper.Map<FTPConfiguration>(cfg), serviceName, actionName);
+                await FTPHelper.DeleteAllFiles(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName);
 
                 var files = _ftpRODbController.GetActionFiles(action.Id);
 
-                for(int i = 0; i < files.Count; ++i)
+                for (int i = 0; i < files.Count; ++i)
                 {
                     _ftpDbController.DeleteFile(files[i].Id);
                 }
@@ -153,11 +162,14 @@ namespace Domain.Controllers.WebControllers
         {
             try
             {
+                ValidationHelper.ValidateServiceName(serviceName);
+                ValidationHelper.ValidateActionName(actionName);
+                ValidationHelper.ValidateFileName(fileName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
                 var action = _ftpRODbController.GetServiceAction(cfg.Id, actionName);
 
-                await FTPHelper.DeleteFile(_mapper.Map<FTPConfiguration>(cfg), serviceName, actionName, fileName);
+                await FTPHelper.DeleteFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName, fileName);
                 await _ftpDbController.DeleteFile(action.Id, fileName);
 
                 return new ResponseModel<bool>()
