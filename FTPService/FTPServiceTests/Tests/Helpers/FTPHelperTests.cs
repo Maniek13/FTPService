@@ -89,7 +89,7 @@ namespace FTPServiceTests.Tests.Helpers
         }
 
         [Fact]
-        public async Task DeleteAllActionFiles()
+        public async Task DeleteDirectory()
         {
             try
             {
@@ -102,7 +102,7 @@ namespace FTPServiceTests.Tests.Helpers
                 };
 
 
-                await FTPHelper.DeleteAllFiles(cfg, "test", "akcja");
+                await FTPHelper.DeleteDirectory(cfg, "test", "akcja");
                 Assert.ThrowsAsync<Exception>(async () => await FTPHelper.GetFile(cfg, "test", "akcja", "1234.jpg"));
             }
             catch (Exception ex)

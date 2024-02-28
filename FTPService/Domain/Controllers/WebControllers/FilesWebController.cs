@@ -133,12 +133,13 @@ namespace Domain.Controllers.WebControllers
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
                 var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
 
+                await FTPHelper.DeleteDirectory(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName);
+
                 var files = _ftpRODbController.GetActionFiles(action.Id);
 
                 for (int i = 0; i < files.Count; ++i)
                 {
-                    await FTPHelper.DeleteFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName, files[i].Name);
-                    await _ftpDbController.DeleteFile(files[i].Id);
+                    _ftpDbController.DeleteFile(files[i].Id);
                 }
 
                 return new ResponseModel<bool>()
@@ -157,6 +158,7 @@ namespace Domain.Controllers.WebControllers
                 };
             }
         }
+
         public async Task<IResponseModel<bool>> DeleteFileAsync(string serviceName, string actionName, string fileName, HttpContext context)
         {
             try
@@ -166,7 +168,7 @@ namespace Domain.Controllers.WebControllers
                 ValidationHelper.ValidateFileName(fileName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
-                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
+                var action = _ftpRODbController.GetServiceAction(cfg.Id, actionName);
 
                 await FTPHelper.DeleteFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName, fileName);
                 await _ftpDbController.DeleteFile(action.Id, fileName);

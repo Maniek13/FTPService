@@ -73,4 +73,5 @@ app.MapDelete("/DeleteAllActionsFilesAsync", filesWebController.DeleteAllActions
     .WithDescription("Usuwanie wszytskich plików akcji")
     .WithOpenApi();
 
+
 app.Run();

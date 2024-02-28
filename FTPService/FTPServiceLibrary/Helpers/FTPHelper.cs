@@ -75,7 +75,7 @@ namespace FTPServiceLibrary.Helpers
             }
         }
 
-        public static async Task DeleteAllFiles(IFTPConfigurationModel cfg, string serviceName, string actionName)
+        public static async Task DeleteDirectory(IFTPConfigurationModel cfg, string serviceName, string actionName)
         {
             try
             {
