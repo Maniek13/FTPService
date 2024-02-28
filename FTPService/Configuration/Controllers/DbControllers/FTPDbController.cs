@@ -14,6 +14,10 @@ namespace Configuration.Controllers.DbControllers
             try
             {
                 using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
+
+                if(_context.FtpConfigurations.Where(el => el.ServiceId == cfg.ServiceId).FirstOrDefault() != null)
+                    throw new Exception("Serwis został już skonfigurowany, jeżeli chcesz coś zmienic edytuj konfigurację");
+
                 await _context.FtpConfigurations.AddAsync((FTPConfigurationDbModel)cfg);
                 await _context.SaveChangesAsync();
                 return cfg;
@@ -45,6 +49,9 @@ namespace Configuration.Controllers.DbControllers
             {
                 using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
                 var temp = _context.FtpConfigurations.Where(el => el.ServiceId == serviceId).FirstOrDefault();
+
+                if (temp == null)
+                    throw new Exception("Brak konfiguracji do usunięcia");
                 _context.FtpConfigurations.Remove(temp);
                 await _context.SaveChangesAsync();
 

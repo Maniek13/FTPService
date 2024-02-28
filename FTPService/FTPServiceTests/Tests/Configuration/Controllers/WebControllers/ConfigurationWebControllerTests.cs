@@ -57,6 +57,7 @@ namespace FTPServiceTests.Tests.Configuration.Controllers.WebControllers
                 var cfgAdded = _controller.GetConfiguration("test", _httpContext);
 
 
+
                 if (cfgAdded.Data == null || 
                     cfgAdded.Data.Id == 0 || 
                     cfgAdded.Data.ServiceId == 0 || 
@@ -66,6 +67,23 @@ namespace FTPServiceTests.Tests.Configuration.Controllers.WebControllers
                     cfgAdded.Data.Login != "test" || 
                     cfgAdded.Data.Password != "12345678")
                     Assert.Fail("nie dodano");
+
+
+                FTPConfigurationModel cfgToAdd2 = new()
+                {
+                    Name = "test",
+                    Url = "nowy",
+                    Port = 245,
+                    Login = "test",
+                    Password = "12345678"
+                };
+
+
+                var secondCfg = await _controller.AddConfigurationAsync("test", cfgToAdd2, _httpContext);
+
+                if (secondCfg.Data != null)
+                    Assert.Fail("Dodano kolejną konfigurację");
+
 
                 FTPConfigurationModel cfgToEdit = new()
                 {
@@ -91,7 +109,7 @@ namespace FTPServiceTests.Tests.Configuration.Controllers.WebControllers
                     cfgEdited.Data.Name != "edited" || 
                     cfgEdited.Data.Login != "edited" || 
                     cfgEdited.Data.Password != "edited")
-                    Assert.Fail("nie edutowano");
+                    Assert.Fail("nie edytowano");
 
 
                 _ = await _controller.DeleteConfigurationAsync("test", _httpContext);
@@ -106,7 +124,9 @@ namespace FTPServiceTests.Tests.Configuration.Controllers.WebControllers
             }
             finally
             {
-                _ = await _controller.DeleteConfigurationAsync("test", _httpContext);
+                var toDel = _controller.GetConfiguration("test", _httpContext);
+                if (toDel.Data != null)
+                    _ = await _controller.DeleteConfigurationAsync("test", _httpContext);
             }
         }
         [Fact]
