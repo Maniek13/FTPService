@@ -26,7 +26,6 @@ var mapperConfig = new MapperConfiguration(mc =>
 IMapper mapper = mapperConfig.CreateMapper();
 
 
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -52,17 +51,19 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 FilesWebController filesWebController = new(mapper, app.Logger, new FTPRODbController(), new FTPDbController());
-app.MapGet("/SendFileAsync", filesWebController.SendFilesAsync)
-    .WithDescription("Wysy³anie pliku")
-    .WithOpenApi();
 
-app.MapPost("/GetFileAsync", filesWebController.GetFileAsync)
+app.MapGet("/GetFileAsync", filesWebController.GetFileAsync)
     .WithDescription("Pobieranie pliku")
     .WithOpenApi();
 
-app.MapPut("/GetFilesAsync", filesWebController.GetFilesAsync)
+app.MapGet("/GetFilesAsync", filesWebController.GetFilesAsync)
     .WithDescription("Pobieranie plików akcji")
     .WithOpenApi();
+
+app.MapPost("/SendFilesAsync", filesWebController.SendFilesAsync)
+    .WithDescription("Wysy³anie plików")
+    .WithOpenApi()
+    .DisableAntiforgery();
 
 app.MapDelete("/DeleteFileAsync", filesWebController.DeleteFileAsync)
     .WithDescription("Usuwanie pliku")

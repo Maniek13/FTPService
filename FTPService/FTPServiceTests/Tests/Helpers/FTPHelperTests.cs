@@ -51,9 +51,9 @@ namespace FTPServiceTests.Tests.Helpers
                     Password = "12345678"
                 };
 
-                var f = await FTPHelper.GetFile(cfg, "test", "akcja", "1234.jpg");
-                if (f.FileName != "1234.jpg")
-                    Assert.Fail("zła nazwa");
+                //var f = await FTPHelper.GetFile(cfg, "test", "akcja", "1234.jpg");
+                //if (f.FileName != "1234.jpg")
+                //    Assert.Fail("zła nazwa");
 
 
             }

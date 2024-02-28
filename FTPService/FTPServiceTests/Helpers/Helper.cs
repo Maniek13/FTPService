@@ -5,7 +5,8 @@ namespace FTPServiceTests.Helpers
 {
     public static class Helper
     {
-        public static void SetConnectionStrings()       {
+        public static void SetConnectionStrings()
+        {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile($"appsettings.json");
             var config = configuration.Build();

@@ -31,10 +31,10 @@ namespace FTPServiceLibrary.Helpers
             }
             finally
             {
-                File.Delete(fullPath);
+                System.IO.File.Delete(fullPath);
             }
         }
-        public static async Task<IFormFile> GetFile(IFTPConfigurationModel cfg, string serviceName, string actionName, string fileName)
+        public static async Task<byte[]> GetFile(IFTPConfigurationModel cfg, string serviceName, string actionName, string fileName)
         {
             string tempPath = AppDomain.CurrentDomain.BaseDirectory + "\\" + serviceName + "\\" + actionName;
             string fullPath = tempPath + "\\" + fileName;
@@ -49,21 +49,14 @@ namespace FTPServiceLibrary.Helpers
                     await ftp.DownloadFile(fullPath, serviceName + "//" + actionName + "//" + fileName, token: token);
                 }
 
+                var file = System.IO.File.ReadAllBytes(fullPath);
+                System.IO.File.Delete(fullPath);
 
-                using var stream = File.OpenRead(fullPath);
-                return new FormFile(stream, 0, stream.Length, null, Path.GetFileName(stream.Name))
-                {
-                    Headers = new HeaderDictionary()
-                };
-
+                return file;
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
-            }
-            finally
-            {
-                File.Delete(fullPath);
             }
         }
 

@@ -54,13 +54,13 @@ namespace FTPServiceTests.Tests.Configuration.Controllers.WebControllers
                 };
                 _ = await _controller.AddConfigurationAsync("test", cfgToAdd, _httpContext);
                 var cfgAdded = _controller.GetConfiguration("test", _httpContext);
-                if (cfgAdded.Data == null || 
-                    cfgAdded.Data.Id == 0 || 
-                    cfgAdded.Data.ServiceId == 0 || 
-                    cfgAdded.Data.Url != "nowy" || 
-                    cfgAdded.Data.Port != 245 || 
-                    cfgAdded.Data.Name != "test" || 
-                    cfgAdded.Data.Login != "test" || 
+                if (cfgAdded.Data == null ||
+                    cfgAdded.Data.Id == 0 ||
+                    cfgAdded.Data.ServiceId == 0 ||
+                    cfgAdded.Data.Url != "nowy" ||
+                    cfgAdded.Data.Port != 245 ||
+                    cfgAdded.Data.Name != "test" ||
+                    cfgAdded.Data.Login != "test" ||
                     cfgAdded.Data.Password != "12345678")
                     Assert.Fail("nie dodano");
 
@@ -92,13 +92,13 @@ namespace FTPServiceTests.Tests.Configuration.Controllers.WebControllers
                 };
                 _ = await _controller.EditConfigurationAsync("test", cfgToEdit, _httpContext);
                 var cfgEdited = _controller.GetConfiguration("test", _httpContext);
-                if (cfgEdited.Data == null || 
-                    cfgEdited.Data.Id != cfgAdded.Data.Id || 
-                    cfgEdited.Data.ServiceId == cfgAdded.Data.Id || 
-                    cfgEdited.Data.Url != "edited" || 
-                    cfgEdited.Data.Port != 1234 || 
-                    cfgEdited.Data.Name != "edited" || 
-                    cfgEdited.Data.Login != "edited" || 
+                if (cfgEdited.Data == null ||
+                    cfgEdited.Data.Id != cfgAdded.Data.Id ||
+                    cfgEdited.Data.ServiceId == cfgAdded.Data.Id ||
+                    cfgEdited.Data.Url != "edited" ||
+                    cfgEdited.Data.Port != 1234 ||
+                    cfgEdited.Data.Name != "edited" ||
+                    cfgEdited.Data.Login != "edited" ||
                     cfgEdited.Data.Password != "edited")
                     Assert.Fail("nie edytowano");
 
@@ -109,7 +109,7 @@ namespace FTPServiceTests.Tests.Configuration.Controllers.WebControllers
                 if (cfgDeleted.Data != null)
                     Assert.Fail("nie usunięto");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Assert.Fail(ex.ToString());
             }
@@ -131,12 +131,12 @@ namespace FTPServiceTests.Tests.Configuration.Controllers.WebControllers
                     Path = "test",
                 };
                 await _controller.AddActionFolderAsync("test", actionModel, _httpContext);
-                var actionAdd =  _controller.GetActionsFolders("test", _httpContext);
+                var actionAdd = _controller.GetActionsFolders("test", _httpContext);
                 if (actionAdd.Data == null ||
                     actionAdd.Data[0].Id == 0 ||
                     actionAdd.Data[0].ActionName != "test" ||
                     actionAdd.Data[0].Path != "test" ||
-                    actionAdd.Data.Count != 1 )
+                    actionAdd.Data.Count != 1)
                     Assert.Fail("nie dodano");
 
 

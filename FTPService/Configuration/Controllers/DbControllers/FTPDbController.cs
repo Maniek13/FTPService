@@ -1,5 +1,4 @@
 ﻿using Configuration.Data;
-using ErrorOr;
 using FTPServiceLibrary.Interfaces.DbControllers;
 using FTPServiceLibrary.Interfaces.Models.DbModels;
 using FTPServiceLibrary.Models;
@@ -15,7 +14,7 @@ namespace Configuration.Controllers.DbControllers
             {
                 using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
 
-                if(_context.FtpConfigurations.Where(el => el.ServiceId == cfg.ServiceId).FirstOrDefault() != null)
+                if (_context.FtpConfigurations.Where(el => el.ServiceId == cfg.ServiceId).FirstOrDefault() != null)
                     throw new Exception("Serwis został już skonfigurowany, jeżeli chcesz coś zmienic edytuj konfigurację");
 
                 await _context.FtpConfigurations.AddAsync((FTPConfigurationDbModel)cfg);

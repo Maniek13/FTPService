@@ -20,13 +20,14 @@ namespace Domain.Controllers.WebControllers
         {
             try
             {
+
                 ValidationHelper.ValidateServiceName(serviceName);
                 ValidationHelper.ValidateActionName(actionName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
 
 
-                var action = _ftpRODbController.GetServiceAction(cfg.Id, actionName);
+                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
 
                 for (int i = 0; i < files.Count; ++i)
                 {
@@ -35,7 +36,7 @@ namespace Domain.Controllers.WebControllers
                     var file = new FilesDbModel()
                     {
                         ServiceActionId = action.Id,
-                        Name = files[i].Name,
+                        Name = files[i].FileName,
                         Path = serviceName + "//" + actionName + "//" + files[i].FileName,
                     };
 
@@ -58,7 +59,7 @@ namespace Domain.Controllers.WebControllers
                 };
             }
         }
-        public async Task<IResponseModel<FormFileCollection>> GetFilesAsync(string serviceName, string actionName, HttpContext context)
+        public async Task<IResponseModel<List<FtpFile>>> GetFilesAsync(string serviceName, string actionName, HttpContext context)
         {
             try
             {
@@ -70,14 +71,20 @@ namespace Domain.Controllers.WebControllers
 
                 var filesInActionName = _ftpRODbController.GetActionFiles(action.Id);
 
-                FormFileCollection files = new FormFileCollection();
-
+                List<FtpFile> files = new();
                 if (filesInActionName != null)
                     for (int i = 0; i < filesInActionName.Count; ++i)
-                        files.Add(await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.ActionName, filesInActionName[i].Name));
+                    {
+                        var bytes = await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.ActionName, filesInActionName[i].Name);
 
+                        files.Add(new FtpFile()
+                        {
+                            Name = filesInActionName[i].Name,
+                            Data = bytes
+                        });
+                    }
 
-                return new ResponseModel<FormFileCollection>()
+                return new ResponseModel<List<FtpFile>>()
                 {
                     Data = files,
                     Message = "ok",
@@ -86,14 +93,15 @@ namespace Domain.Controllers.WebControllers
             catch (Exception ex)
             {
                 _logger.LogError($"{GetType()} : {ex.Message}");
-                return new ResponseModel<FormFileCollection>()
+                return new ResponseModel<List<FtpFile>>()
                 {
                     Data = null,
                     Message = ex.Message,
                 };
             }
         }
-        public async Task<IResponseModel<FormFile>> GetFileAsync(string serviceName, int id, HttpContext context)
+
+        public async Task<IResult> GetFileAsync(string serviceName, int id, HttpContext context)
         {
             try
             {
@@ -105,22 +113,14 @@ namespace Domain.Controllers.WebControllers
                 var file = _ftpRODbController.GetFile(id);
                 var action = _ftpRODbController.GetServiceAction(file.ServiceActionId);
 
-                IFormFile f = await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.ActionName, file.Name);
+                var fileToDownload = await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.ActionName, file.Name);
 
-                return new ResponseModel<FormFile>()
-                {
-                    Data = (FormFile)f,
-                    Message = "ok",
-                };
+                return Results.File(fileToDownload, null, file.Name);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{GetType()} : {ex.Message}");
-                return new ResponseModel<FormFile>()
-                {
-                    Data = null,
-                    Message = ex.Message,
-                };
+
+                return Results.NotFound(ex.Message);
             }
         }
         public async Task<IResponseModel<bool>> DeleteAllActionsFilesAsync(string serviceName, string actionName, HttpContext context)
@@ -167,7 +167,7 @@ namespace Domain.Controllers.WebControllers
                 ValidationHelper.ValidateFileName(fileName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
-                var action = _ftpRODbController.GetServiceAction(cfg.Id, actionName);
+                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
 
                 await FTPHelper.DeleteFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName, fileName);
                 await _ftpDbController.DeleteFile(action.Id, fileName);
