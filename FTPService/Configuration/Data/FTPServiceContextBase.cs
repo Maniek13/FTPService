@@ -43,7 +43,6 @@ namespace Configuration.Data
 
             modelBuilder.Entity<ServicesPermisionsDbModel>().HasIndex(u => u.ServiceName).IsUnique();
             modelBuilder.Entity<FTPConfigurationDbModel>().HasIndex(u => u.ServiceId).IsUnique();
-            modelBuilder.Entity<ServiceActionDbModel>().HasIndex(u => u.ActionName).IsUnique();
 
             modelBuilder.Entity<ServicesPermisionsDbModel>()
                .HasOne<FTPConfigurationDbModel>(x => x.Configuration)

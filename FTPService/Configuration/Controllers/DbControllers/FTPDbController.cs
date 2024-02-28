@@ -67,6 +67,9 @@ namespace Configuration.Controllers.DbControllers
             try
             {
                 using FTPServiceContext _context = new FTPServiceContext(AppConfig.ConnectionString);
+                if (_context.FtpServicesActions.Where(el => el.ServiceId == action.ServiceId && el.ActionName == action.ActionName).FirstOrDefault() != null)
+                    throw new Exception("Dodano już taką akcję dla serwisu, jeżeli chcesz edytować użyj akcji do edytowania");
+
                 await _context.FtpServicesActions.AddAsync((ServiceActionDbModel)action);
                 await _context.SaveChangesAsync();
                 return action;
