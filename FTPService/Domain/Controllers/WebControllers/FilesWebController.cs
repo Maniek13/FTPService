@@ -168,7 +168,7 @@ namespace Domain.Controllers.WebControllers
                 ValidationHelper.ValidateFileName(fileName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
-                var action = _ftpRODbController.GetServiceAction(cfg.Id, actionName);
+                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
 
                 await FTPHelper.DeleteFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName, fileName);
                 await _ftpDbController.DeleteFile(action.Id, fileName);
