@@ -1,4 +1,4 @@
-﻿namespace FTPServiceTests.Configuration.Controllers.DbControllers
+﻿namespace FTPServiceTests.Tests.Configuration.Controllers.DbControllers
 {
     internal class FTPDbROControllerTests
     {

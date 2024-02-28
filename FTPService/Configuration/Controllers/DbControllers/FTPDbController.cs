@@ -1,4 +1,5 @@
 ﻿using Configuration.Data;
+using ErrorOr;
 using FTPServiceLibrary.Interfaces.DbControllers;
 using FTPServiceLibrary.Interfaces.Models.DbModels;
 using FTPServiceLibrary.Models;

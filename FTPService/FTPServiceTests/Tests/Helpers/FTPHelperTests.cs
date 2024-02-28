@@ -2,7 +2,7 @@
 using FTPServiceLibrary.Interfaces.Models;
 using Microsoft.AspNetCore.Http;
 
-namespace FTPServiceTests.Helpers
+namespace FTPServiceTests.Tests.Helpers
 {
     public class FTPHelperTests
     {

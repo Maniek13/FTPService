@@ -57,15 +57,15 @@ app.MapGet("/GetConfiguration", configurationWebController.GetConfiguration)
     .WithDescription("Get coonfiguration")
     .WithOpenApi();
 
-app.MapPost("/SetConfiguration", configurationWebController.AddConfiguration)
+app.MapPost("/AddConfigurationAsync", configurationWebController.AddConfigurationAsync)
     .WithDescription("Set coonfiguration")
     .WithOpenApi();
 
-app.MapPut("/UpdateConfiguration", configurationWebController.EditConfiguration)
+app.MapPut("/EditConfigurationAsync", configurationWebController.EditConfigurationAsync)
     .WithDescription("Update coonfiguration")
     .WithOpenApi();
 
-app.MapDelete("/DeleteConfiguration", configurationWebController.DeleteConfiguration)
+app.MapDelete("/DeleteActionFolderAsync", configurationWebController.DeleteActionFolderAsync)
     .WithDescription("Remove coonfiguration")
     .WithOpenApi();
 
@@ -73,15 +73,15 @@ app.MapGet("/GetActionsFolders", configurationWebController.GetActionsFolders)
     .WithDescription("Get action folder")
     .WithOpenApi();
 
-app.MapPost("/AddActionFolder", configurationWebController.AddActionFolder)
+app.MapPost("/AddActionFolderAsync", configurationWebController.AddActionFolderAsync)
     .WithDescription("Set action folder")
     .WithOpenApi();
 
-app.MapPut("/UpdateActionFolder", configurationWebController.EditeActionFolder)
+app.MapPut("/EditConfigurationAsync", configurationWebController.EditConfigurationAsync)
     .WithDescription("Update action folder")
     .WithOpenApi();
 
-app.MapDelete("/DeleteActionFolder", configurationWebController.DeleteActionFolder)
+app.MapDelete("/DeleteActionFolderAsync", configurationWebController.DeleteActionFolderAsync)
     .WithDescription("Remove action folder")
     .WithOpenApi();
 

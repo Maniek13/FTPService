@@ -1,4 +1,4 @@
-﻿namespace FTPServiceTests.Domain.Controllers.WebControllers
+﻿namespace FTPServiceTests.Tests.Domain.Controllers.WebControllers
 {
     public class FilesWebControllerTests
     {

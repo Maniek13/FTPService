@@ -123,7 +123,7 @@ namespace Domain.Controllers.WebControllers
                 };
             }
         }
-        public async Task<IResponseModel<bool>> DeleteAllActionsFiles(string serviceName, string actionName, HttpContext context)
+        public async Task<IResponseModel<bool>> DeleteAllActionsFilesAsync(string serviceName, string actionName, HttpContext context)
         {
             try
             {
@@ -158,7 +158,7 @@ namespace Domain.Controllers.WebControllers
                 };
             }
         }
-        public async Task<IResponseModel<bool>> DeleteFile(string serviceName, string actionName, string fileName, HttpContext context)
+        public async Task<IResponseModel<bool>> DeleteFileAsync(string serviceName, string actionName, string fileName, HttpContext context)
         {
             try
             {

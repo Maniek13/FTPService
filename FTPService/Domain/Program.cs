@@ -64,11 +64,11 @@ app.MapPut("/GetFilesAsync", filesWebController.GetFilesAsync)
     .WithDescription("Pobieranie plików akcji")
     .WithOpenApi();
 
-app.MapDelete("/DeleteFile", filesWebController.DeleteFile)
+app.MapDelete("/DeleteFileAsync", filesWebController.DeleteFileAsync)
     .WithDescription("Usuwanie pliku")
     .WithOpenApi();
 
-app.MapDelete("/DeleteAllActionsFiles", filesWebController.DeleteAllActionsFiles)
+app.MapDelete("/DeleteAllActionsFilesAsync", filesWebController.DeleteAllActionsFilesAsync)
     .WithDescription("Usuwanie wszytskich plików akcji")
     .WithOpenApi();
 

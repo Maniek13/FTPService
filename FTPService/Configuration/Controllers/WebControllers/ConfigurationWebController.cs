@@ -8,7 +8,7 @@ using FTPServiceLibrary.Models.DbModels;
 
 namespace Configuration.Controllers.DbControllers
 {
-    internal class ConfigurationWebController(IMapper mapper, ILogger logger, IFTPRODbController fTPRODbController, IFTPDbController fTPDbController) : IConfigurationWebController
+    public class ConfigurationWebController(IMapper mapper, ILogger logger, IFTPRODbController fTPRODbController, IFTPDbController fTPDbController) : IConfigurationWebController
     {
         readonly ILogger _logger = logger;
         readonly IMapper _mapper = mapper;
@@ -40,7 +40,7 @@ namespace Configuration.Controllers.DbControllers
                 };
             }
         }
-        public async Task<IResponseModel<FTPConfigurationModel>> AddConfiguration(string serviceName, FTPConfigurationModel cfg, HttpContext context)
+        public async Task<IResponseModel<FTPConfigurationModel>> AddConfigurationAsync(string serviceName, FTPConfigurationModel cfg, HttpContext context)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace Configuration.Controllers.DbControllers
                 };
             }
         }
-        public async Task<IResponseModel<bool>> EditConfiguration(string serviceName, FTPConfigurationModel cfg, HttpContext context)
+        public async Task<IResponseModel<bool>> EditConfigurationAsync(string serviceName, FTPConfigurationModel cfg, HttpContext context)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace Configuration.Controllers.DbControllers
             }
         }
 
-        public async Task<IResponseModel<bool>> DeleteConfiguration(string serviceName, HttpContext context)
+        public async Task<IResponseModel<bool>> DeleteConfigurationAsync(string serviceName, HttpContext context)
         {
             try
             {
@@ -120,7 +120,7 @@ namespace Configuration.Controllers.DbControllers
             }
         }
 
-        public async Task<IResponseModel<List<ServiceActionModel>>> GetActionsFolders(string serviceName, HttpContext context)
+        public IResponseModel<List<ServiceActionModel>> GetActionsFolders(string serviceName, HttpContext context)
         {
             try
             {
@@ -153,7 +153,7 @@ namespace Configuration.Controllers.DbControllers
                 };
             }
         }
-        public async Task<IResponseModel<ServiceActionModel>> AddActionFolder(string serviceName, ServiceActionModel servicesAction, HttpContext context)
+        public async Task<IResponseModel<ServiceActionModel>> AddActionFolderAsync(string serviceName, ServiceActionModel servicesAction, HttpContext context)
         {
             try
             {
@@ -181,7 +181,7 @@ namespace Configuration.Controllers.DbControllers
                 };
             }
         }
-        public async Task<IResponseModel<bool>> EditeActionFolder(string serviceName, ServiceActionModel servicesAction, HttpContext context)
+        public async Task<IResponseModel<bool>> EditeActionFolderAsync(string serviceName, ServiceActionModel servicesAction, HttpContext context)
         {
             try
             {
@@ -208,7 +208,7 @@ namespace Configuration.Controllers.DbControllers
                 };
             }
         }
-        public async Task<IResponseModel<bool>> DeleteActionFolder(string serviceName, string actionName, HttpContext context)
+        public async Task<IResponseModel<bool>> DeleteActionFolderAsync(string serviceName, string actionName, HttpContext context)
         {
             try
             {
