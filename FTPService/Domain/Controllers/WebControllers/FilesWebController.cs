@@ -131,15 +131,14 @@ namespace Domain.Controllers.WebControllers
                 ValidationHelper.ValidateActionName(actionName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
-                var action = _ftpRODbController.GetServiceAction(cfg.Id, actionName);
-
-                await FTPHelper.DeleteAllFiles(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName);
+                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
 
                 var files = _ftpRODbController.GetActionFiles(action.Id);
 
                 for (int i = 0; i < files.Count; ++i)
                 {
-                    _ftpDbController.DeleteFile(files[i].Id);
+                    await FTPHelper.DeleteFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName, files[i].Name);
+                    await _ftpDbController.DeleteFile(files[i].Id);
                 }
 
                 return new ResponseModel<bool>()
