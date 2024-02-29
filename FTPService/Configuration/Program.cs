@@ -1,8 +1,10 @@
 using AutoMapper;
 using Configuration.Controllers.DbControllers;
+using Configuration.Data;
 using FTPServiceLibrary.Helpers;
 using FTPServiceLibrary.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
 using System.Text;
@@ -27,7 +29,7 @@ IMapper mapper = mapperConfig.CreateMapper();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddSqlServer<FTPServiceContextBase>(AppConfig.ConnectionString);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(o =>
@@ -43,6 +45,12 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<FTPServiceContextBase>();
+        db.Database.Migrate();
+    }
+
     app.UseSwagger();
     app.UseSwaggerUI();
 }

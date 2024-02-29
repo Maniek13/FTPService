@@ -1,0 +1,45 @@
+services:
+  configuration:
+    image: ${DOCKER_REGISTRY-}configuration
+    build:
+      context: . 
+      dockerfile: Configuration/Dockerfile
+    ports:
+      - 80
+      - 443
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
+    - ASPNETCORE_URLS=https://+:443;http://+:80
+    - ASPNETCORE_Kestrel__Certificates__Default__Password=12345qwert
+    - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+    - ~/.aspnet/https:/https:ro
+    links:
+    - sqlserver
+  domain:
+    image: ${DOCKER_REGISTRY-}domain
+    build:
+      context: .
+      dockerfile: Domain/Dockerfile
+    ports:
+      - 80
+      - 443
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
+    - ASPNETCORE_URLS=https://+:443;http://+:80
+    - ASPNETCORE_Kestrel__Certificates__Default__Password=12345qwert
+    - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+    - ~/.aspnet/https:/https:ro
+    links:
+    - sqlserver
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+        - MSSQL_SA_PASSWORD=myStong_Password123
+        - ACCEPT_EULA=Y
+        - MSSQL_PID=Express
+    ports:
+        - "1434:1433"
+
+
