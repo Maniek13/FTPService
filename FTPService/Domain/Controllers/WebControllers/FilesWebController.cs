@@ -31,13 +31,13 @@ namespace Domain.Controllers.WebControllers
 
                 for (int i = 0; i < files.Count; ++i)
                 {
-                    await FTPHelper.SendFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName, files[i]);
+                    await FTPHelper.SendFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, files[i]);
 
                     var file = new FilesDbModel()
                     {
                         ServiceActionId = action.Id,
                         Name = files[i].FileName,
-                        Path = serviceName + "//" + actionName + "//" + files[i].FileName,
+                        Path = serviceName + "//" + action.Path + "//" + files[i].FileName,
                     };
 
                     await _ftpDbController.AddFile(file);
@@ -75,7 +75,7 @@ namespace Domain.Controllers.WebControllers
                 if (filesInActionName != null)
                     for (int i = 0; i < filesInActionName.Count; ++i)
                     {
-                        var bytes = await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.ActionName, filesInActionName[i].Name);
+                        var bytes = await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, filesInActionName[i].Name);
 
                         files.Add(new FtpFile()
                         {
@@ -113,7 +113,7 @@ namespace Domain.Controllers.WebControllers
                 var file = _ftpRODbController.GetFile(id);
                 var action = _ftpRODbController.GetServiceAction(file.ServiceActionId);
 
-                var fileToDownload = await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.ActionName, file.Name);
+                var fileToDownload = await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, file.Name);
 
                 return Results.File(fileToDownload, null, file.Name);
             }
@@ -133,7 +133,10 @@ namespace Domain.Controllers.WebControllers
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
                 var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
 
-                await FTPHelper.DeleteDirectory(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName);
+
+
+
+                await FTPHelper.DeleteDirectory(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path);
 
                 var files = _ftpRODbController.GetActionFiles(action.Id);
 
