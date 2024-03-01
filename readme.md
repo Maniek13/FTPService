@@ -8,6 +8,6 @@ Konfiguracja:
 
 Domena:
 - do pobrania pliku potrzebna jest znajomość akcji i nazwy pliku. Nazwą pliku jest nazwa razem z rozszerzeniem.
-- można pobrać wszytstkie pliki w formie tablicy bajtów
+- można pobrać wszytstkie pliki akcji w formie zip
 - pobieranie plików po id, ogólnie jest taka opcja ale trzeba znać id pliku w bazie danych. W przyszłosci może zostanie to jakoś rozwiązane.
 - po usunięciu wszystkich plików, wpis w bazie danych z folderem do akcji zostaje. Trzeba go usunąć poprzez konfigurację

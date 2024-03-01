@@ -56,8 +56,8 @@ app.MapGet("/GetFileAsync", filesWebController.GetFileAsync)
     .WithDescription("Pobieranie pliku")
     .WithOpenApi();
 
-app.MapGet("/GetFilesAsync", filesWebController.GetFilesAsync)
-    .WithDescription("Pobieranie plików akcji")
+app.MapGet("/GetAllActionFilesInZipFile", filesWebController.GetAllActionFilesInZipFile)
+    .WithDescription("Pobieranie wszytskich plików akcji w formie zip")
     .WithOpenApi();
 
 app.MapPost("/SendFilesAsync", filesWebController.SendFilesAsync)

@@ -59,7 +59,7 @@ namespace Domain.Controllers.WebControllers
                 };
             }
         }
-        public async Task<IResponseModel<List<FtpFile>>> GetFilesAsync(string serviceName, string actionName, HttpContext context)
+        public async Task<IResult> GetAllActionFilesInZipFile(string serviceName, string actionName, HttpContext context)
         {
             try
             {
@@ -70,36 +70,26 @@ namespace Domain.Controllers.WebControllers
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
 
                 var filesInActionName = _ftpRODbController.GetActionFiles(action.Id);
+                string uniqeId = Guid.NewGuid().ToString();
+                var pathToZipFile = await FTPHelper.GetPathToZipArchiweWithActionDirectoryFiles(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, action.ActionName, uniqeId);
 
-                List<FtpFile> files = new();
-                if (filesInActionName != null)
-                    for (int i = 0; i < filesInActionName.Count; ++i)
-                    {
-                        var bytes = await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, filesInActionName[i].Name);
+                var bytes = File.ReadAllBytes(pathToZipFile);
+                var fileName = $"{actionName}.zip";
+                var pathToDir = pathToZipFile.Replace(fileName, "");
+                File.Delete(pathToZipFile);
+                Directory.Delete(pathToDir);
 
-                        files.Add(new FtpFile()
-                        {
-                            Name = filesInActionName[i].Name,
-                            Data = bytes
-                        });
-                    }
 
-                return new ResponseModel<List<FtpFile>>()
-                {
-                    Data = files,
-                    Message = "ok",
-                };
+                return Results.File(bytes, null, fileName);
+
             }
             catch (Exception ex)
             {
                 _logger.LogError($"{GetType()} : {ex.Message}");
-                return new ResponseModel<List<FtpFile>>()
-                {
-                    Data = null,
-                    Message = ex.Message,
-                };
+                return Results.NotFound(ex.Message);
             }
         }
+
 
         public async Task<IResult> GetFileAsync(string serviceName, int id, HttpContext context)
         {
@@ -119,7 +109,7 @@ namespace Domain.Controllers.WebControllers
             }
             catch (Exception ex)
             {
-
+                _logger.LogError($"{GetType()} : {ex.Message}");
                 return Results.NotFound(ex.Message);
             }
         }
