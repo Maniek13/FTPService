@@ -11,8 +11,8 @@ namespace FTPServiceLibrary.Interfaces.DbControllers
         Task<IServiceActionDbModel> AddActionFolderAsync(IServiceActionDbModel action);
         Task<IServiceActionDbModel> EditActionFolderAsync(IServiceActionDbModel action);
         Task RemoveActionFolderAsync(string actionName);
-        Task AddFile(IFilesDbModel file);
-        Task DeleteFile(int id);
-        Task DeleteFile(int actionId, string fileName);
+        Task AddFileAsync(IFilesDbModel file);
+        Task DeleteFileAsync(int id);
+        Task DeleteFileAsync(int actionId, string fileName);
     }
 }

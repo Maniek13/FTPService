@@ -1,5 +1,4 @@
 ﻿using FTPServiceLibrary.Interfaces.Models;
-using Microsoft.IdentityModel.Tokens;
 
 namespace FTPServiceLibrary.Helpers
 {

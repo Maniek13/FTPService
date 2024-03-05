@@ -108,7 +108,7 @@ namespace Configuration.Controllers.DbControllers
             }
         }
 
-        public async Task AddFile(IFilesDbModel file)
+        public async Task AddFileAsync(IFilesDbModel file)
         {
             try
             {
@@ -122,7 +122,7 @@ namespace Configuration.Controllers.DbControllers
             }
         }
 
-        public async Task DeleteFile(int id)
+        public async Task DeleteFileAsync(int id)
         {
             try
             {
@@ -137,7 +137,7 @@ namespace Configuration.Controllers.DbControllers
             }
         }
 
-        public async Task DeleteFile(int actionId, string fileName)
+        public async Task DeleteFileAsync(int actionId, string fileName)
         {
             try
             {

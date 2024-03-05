@@ -93,7 +93,6 @@ namespace Configuration.Controllers.DbControllers
                 };
             }
         }
-
         public async Task<IResponseModel<bool>> DeleteConfigurationAsync(string serviceName, HttpContext context)
         {
             try
@@ -119,7 +118,6 @@ namespace Configuration.Controllers.DbControllers
                 };
             }
         }
-
         public IResponseModel<List<ServiceActionModel>> GetActionsFolders(string serviceName, HttpContext context)
         {
             try
@@ -163,7 +161,6 @@ namespace Configuration.Controllers.DbControllers
                 servicesAction.ServiceId = permisions.Id;
                 var actionsDb = await _ftpDbController.AddActionFolderAsync(_mapper.Map<ServiceActionDbModel>(servicesAction));
 
-
                 return new ResponseModel<ServiceActionModel>()
                 {
                     Data = _mapper.Map<ServiceActionModel>((ServiceActionDbModel)actionsDb),
@@ -189,7 +186,6 @@ namespace Configuration.Controllers.DbControllers
                 ValidationHelper.ValidateServiceActionModel(servicesAction);
                 _ = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
                 var actionsDb = await _ftpDbController.EditActionFolderAsync(_mapper.Map<ServiceActionDbModel>(servicesAction));
-
 
                 return new ResponseModel<bool>()
                 {

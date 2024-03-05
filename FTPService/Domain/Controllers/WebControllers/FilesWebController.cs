@@ -41,7 +41,7 @@ namespace Domain.Controllers.WebControllers
                         Path = Path.Combine(serviceName, action.Path, files[i].FileName)
                     };
 
-                    await _ftpDbController.AddFile(file);
+                    await _ftpDbController.AddFileAsync(file);
                 }
 
                 return new ResponseModel<bool>()
@@ -91,7 +91,7 @@ namespace Domain.Controllers.WebControllers
             }
             finally
             {
-                if(string.IsNullOrEmpty(pathToZipFile))
+                if (string.IsNullOrEmpty(pathToZipFile))
                     File.Delete(pathToZipFile);
                 if (string.IsNullOrEmpty(pathToDir))
                     Directory.Delete(pathToDir);
@@ -136,7 +136,7 @@ namespace Domain.Controllers.WebControllers
 
                 for (int i = 0; i < files.Count; ++i)
                 {
-                    await _ftpDbController.DeleteFile(files[i].Id);
+                    await _ftpDbController.DeleteFileAsync(files[i].Id);
                 }
 
                 return new ResponseModel<bool>()
@@ -167,7 +167,7 @@ namespace Domain.Controllers.WebControllers
                 var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName) ?? throw new Exception($"Serwis nie posiada akcji: {actionName}");
 
                 await FTPHelper.DeleteFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName, fileName);
-                await _ftpDbController.DeleteFile(action.Id, fileName);
+                await _ftpDbController.DeleteFileAsync(action.Id, fileName);
 
                 return new ResponseModel<bool>()
                 {
