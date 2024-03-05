@@ -1,9 +1,7 @@
 ﻿using FluentFTP;
 using FTPServiceLibrary.Interfaces.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Tokens;
 using System.IO.Compression;
-using System.Net.WebSockets;
 
 namespace FTPServiceLibrary.Helpers
 {
@@ -71,7 +69,7 @@ namespace FTPServiceLibrary.Helpers
         public static async Task<string> CreateZipArchiveWithActionDirectoryFiles(IFTPConfigurationModel cfg, string serviceName, string actionPath, string actionName)
         {
             string uniqueId = Guid.NewGuid().ToString();
-            string zipFileDirectoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "zip", uniqueId); 
+            string zipFileDirectoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "zip", uniqueId);
             string zipTempFilePath = Path.Combine(zipFileDirectoryPath, actionName + ".zip");
             Directory.CreateDirectory(zipFileDirectoryPath);
 
@@ -87,7 +85,7 @@ namespace FTPServiceLibrary.Helpers
                 }
                 ZipFile.CreateFromDirectory(fullDirPath, zipTempFilePath);
 
-                DeletingFilesAndParentFolders(ref fullDirPath, tempDirPath);
+                GarbageCollectionOfTempDirPath(ref fullDirPath, tempDirPath);
 
                 return zipTempFilePath;
             }
@@ -97,8 +95,8 @@ namespace FTPServiceLibrary.Helpers
             }
             finally
             {
-                if(!string.IsNullOrEmpty(fullDirPath))
-                    DeletingFilesAndParentFolders(ref fullDirPath, tempDirPath);
+                if (!string.IsNullOrEmpty(fullDirPath) && fullDirPath.StartsWith(tempDirPath))
+                    GarbageCollectionOfTempDirPath(ref fullDirPath, tempDirPath);
             }
         }
         public static async Task DeleteFile(IFTPConfigurationModel cfg, string serviceName, string actionPath, string fileName)
@@ -129,10 +127,13 @@ namespace FTPServiceLibrary.Helpers
                 throw new Exception(e.Message, e);
             }
         }
-        private static void DeletingFilesAndParentFolders(ref string fullDirPath, string tempDirPath)
+        private static void GarbageCollectionOfTempDirPath(ref string fullDirPath, string tempDirPath)
         {
             try
             {
+                if (!fullDirPath.StartsWith(tempDirPath))
+                    throw new Exception($"Pełna ścieżka ({fullDirPath}), musi zaczynać się od tymczasowej ścieżki: ({tempDirPath})");
+
                 if (string.IsNullOrWhiteSpace(fullDirPath) || string.IsNullOrWhiteSpace(tempDirPath))
                     throw new Exception($"Nazwy ścieżek nie mogą być puste. Pełna ścieżka: {fullDirPath}, ścieżka tymczasowa: {tempDirPath}");
 
@@ -147,11 +148,30 @@ namespace FTPServiceLibrary.Helpers
                 if (files != null)
                     for (int i = 0; i < files.Length; ++i)
                         File.Delete(files[i]);
+
+                var subDirectorys = Directory.GetDirectories(fullDirPath);
+
+                if(subDirectorys.Count() != 0)
+                {
+                    fullDirPath = subDirectorys[0];
+                    GarbageCollectionOfTempDirPath(ref fullDirPath, tempDirPath);
+                }
+
+                if (tempDirPath == fullDirPath)
+                {
+                    Directory.Delete(tempDirPath);
+                    fullDirPath = string.Empty;
+                    return;
+                }
+
                 Directory.Delete(fullDirPath);
 
-                fullDirPath = Directory.GetParent(fullDirPath).FullName;
+                var parent = Directory.GetParent(fullDirPath) ?? throw new Exception("Usuwanie śmieci, brak podkatalogu. Coś poszło nie tak, spróbuj ponownie.");
 
-                DeletingFilesAndParentFolders(ref fullDirPath, tempDirPath);
+                if(parent != null )
+                    fullDirPath = parent.FullName;
+
+                GarbageCollectionOfTempDirPath(ref fullDirPath, tempDirPath);
             }
             catch (Exception ex)
             {
