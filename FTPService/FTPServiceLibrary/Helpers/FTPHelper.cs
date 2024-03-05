@@ -97,7 +97,7 @@ namespace FTPServiceLibrary.Helpers
             }
             finally
             {
-                if (!string.IsNullOrEmpty(fullDirPath))
+                if (!string.IsNullOrWhiteSpace(fullDirPath) && fullDirPath.StartsWith(tempDirPath))
                     GarbageCollectionOfTempDirPath(ref fullDirPath, tempDirPath);
             }
         }
