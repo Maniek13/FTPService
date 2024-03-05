@@ -11,3 +11,4 @@ Domena:
 - można pobrać wszytstkie pliki akcji w formie zip
 - pobieranie plików po id, ogólnie jest taka opcja ale trzeba znać id pliku w bazie danych. W przyszłosci może zostanie to jakoś rozwiązane.
 - po usunięciu wszystkich plików, wpis w bazie danych z folderem do akcji zostaje. Trzeba go usunąć poprzez konfigurację
+- po dodaniu tego samego pliku, plik zostaje nadpisany

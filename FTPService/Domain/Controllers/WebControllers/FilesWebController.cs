@@ -15,7 +15,6 @@ namespace Domain.Controllers.WebControllers
         readonly IMapper _mapper = mapper;
         readonly IFTPRODbController _ftpRODbController = fTPRODbController;
         readonly IFTPDbController _ftpDbController = fTPDbController;
-        readonly SemaphoreSlim _semaphore = new(1, 1);
         public async Task<IResponseModel<bool>> SendFilesAsync(string serviceName, string actionName, [FromForm] IFormFileCollection files, HttpContext context)
         {
             try
@@ -28,11 +27,10 @@ namespace Domain.Controllers.WebControllers
 
                 for (int i = 0; i < files.Count; ++i)
                 {
-                    await _semaphore.WaitAsync();
                     await FTPHelper.SendFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, files[i]);
 
                     if (_ftpRODbController.GetFile(action.Id, files[i].FileName) != null)
-                        break;
+                        continue;
 
                     var file = new FileDbModel()
                     {
@@ -59,10 +57,6 @@ namespace Domain.Controllers.WebControllers
                     Message = ex.Message,
                 };
             }
-            finally
-            {
-                _semaphore.Release();
-            }
         }
         public async Task<IResult> GetAllActionFilesInZipFile(string serviceName, string actionName, HttpContext context)
         {
@@ -75,8 +69,8 @@ namespace Domain.Controllers.WebControllers
                 var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName) ?? throw new Exception($"Serwis nie posiada akcji: {actionName}");
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("Brak konfiguracji");
 
-                string uniqeId = Guid.NewGuid().ToString();
-                pathToZipFile = await FTPHelper.CreateZipArchiveWithActionDirectoryFiles(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, action.ActionName, uniqeId);
+
+                pathToZipFile = await FTPHelper.CreateZipArchiveWithActionDirectoryFiles(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, action.ActionName);
 
                 var bytes = File.ReadAllBytes(pathToZipFile);
                 var fileName = $"{actionName}.zip";
@@ -91,9 +85,9 @@ namespace Domain.Controllers.WebControllers
             }
             finally
             {
-                if (string.IsNullOrEmpty(pathToZipFile))
+                if (!string.IsNullOrEmpty(pathToZipFile))
                     File.Delete(pathToZipFile);
-                if (string.IsNullOrEmpty(pathToDir))
+                if (!string.IsNullOrEmpty(pathToDir))
                     Directory.Delete(pathToDir);
             }
         }
@@ -129,9 +123,7 @@ namespace Domain.Controllers.WebControllers
                 var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("Brak konfiguracji");
                 var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName) ?? throw new Exception($"Serwis nie posiada akcji: {actionName}");
 
-
                 await FTPHelper.DeleteDirectory(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path);
-
                 var files = _ftpRODbController.GetActionFiles(action.Id);
 
                 for (int i = 0; i < files.Count; ++i)
