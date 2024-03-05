@@ -7,9 +7,10 @@ namespace FTPServiceLibrary.Interfaces.DbControllers
         ServicesPermisionsDbModel GetPermision(string serviceName);
         FTPConfigurationDbModel GetFTPConfiguration(int serviceId);
         List<ServiceActionDbModel> GetServiceActions(int serviceId);
-        FilesDbModel GetFile(int id);
+        FileDbModel GetFile(int id);
+        FileDbModel GetFile(int serviceActionId, string fileName);
         ServiceActionDbModel GetServiceAction(int serviceId, string actionName);
         ServiceActionDbModel GetServiceAction(int actionId);
-        List<FilesDbModel> GetActionFiles(int actionId);
+        List<FileDbModel> GetActionFiles(int actionId);
     }
 }

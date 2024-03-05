@@ -7,12 +7,11 @@ namespace FTPServiceLibrary.Helpers
 {
     public class FTPHelper
     {
-        object lockFtp;
-        // path: /serviceName/actionName
+        private static readonly SemaphoreSlim _semaphore = new(1, 1);
         public static async Task SendFile(IFTPConfigurationModel cfg, string serviceName, string actionPath, IFormFile file)
         {
-            string tempPath = AppDomain.CurrentDomain.BaseDirectory + "\\" + serviceName + "\\" + actionPath;
-            string fullPath = tempPath + "\\" + file.FileName;
+            string tempPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, serviceName, actionPath);
+            string fullPath = Path.Combine(tempPath, file.FileName);
             try
             {
                 var token = new CancellationToken();
@@ -20,12 +19,13 @@ namespace FTPServiceLibrary.Helpers
                 await ftp.Connect(token);
                 Directory.CreateDirectory(tempPath);
 
+                _semaphore.Wait();
                 using (Stream fileStream = new FileStream(fullPath, FileMode.Create))
                 {
                     await file.CopyToAsync(fileStream);
                 }
 
-                await ftp.UploadFile(fullPath, serviceName + "//" + actionPath + "//" + file.FileName, FtpRemoteExists.Overwrite, true, token: token);
+                await ftp.UploadFile(fullPath, Path.Combine(serviceName, actionPath, file.FileName), FtpRemoteExists.Overwrite, true, token: token);
             }
             catch (Exception e)
             {
@@ -33,29 +33,28 @@ namespace FTPServiceLibrary.Helpers
             }
             finally
             {
-                System.IO.File.Delete(fullPath);
+                File.Delete(fullPath);
+                _semaphore.Release();
             }
         }
         public static async Task<byte[]> GetFile(IFTPConfigurationModel cfg, string serviceName, string actionPath, string fileName)
         {
-            string tempPath = AppDomain.CurrentDomain.BaseDirectory + "\\" + serviceName + "\\" + actionPath;
-            string fullPath = tempPath + "\\" + fileName;
+            string tempPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, serviceName, actionPath);
+            string fullPath = Path.Combine(tempPath, fileName);
 
             try
             {
                 var token = new CancellationToken();
+                byte[] file;
 
-
+                _semaphore.Wait();
 
                 using (var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port))
                 {
                     await ftp.Connect(token);
-                    await ftp.DownloadFile(fullPath, serviceName + "//" + actionPath + "//" + fileName, token: token);
+                    await ftp.DownloadFile(fullPath, Path.Combine(serviceName, actionPath, fileName), token: token);
+                    file = File.ReadAllBytes(fullPath);
                 }
-
-
-                var file = File.ReadAllBytes(fullPath);
-                File.Delete(fullPath);
 
                 return file;
             }
@@ -63,33 +62,33 @@ namespace FTPServiceLibrary.Helpers
             {
                 throw new Exception(e.Message, e);
             }
+            finally
+            {
+                File.Delete(fullPath);
+                _semaphore.Release();
+            }
         }
 
-        public static async Task<string> GetPathToZipArchiweWithActionDirectoryFiles(IFTPConfigurationModel cfg, string serviceName, string actionPath, string actionName, string uniqueId)
+        public static async Task<string> CreateZipArchiveWithActionDirectoryFiles(IFTPConfigurationModel cfg, string serviceName, string actionPath, string actionName, string uniqueId)
         {
             string tempPath = AppDomain.CurrentDomain.BaseDirectory;
-            string zipFileDirectoryPath = AppDomain.CurrentDomain.BaseDirectory + "\\zip\\" + uniqueId;
+            string zipFileDirectoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "zip", uniqueId);
 
             Directory.CreateDirectory(zipFileDirectoryPath);
 
             string zipTempFilePath = Path.Combine(zipFileDirectoryPath, actionName + ".zip");
-            string fullPath = tempPath + "\\" + uniqueId;
+            string fullPath = Path.Combine(tempPath, uniqueId);
 
             try
             {
                 var token = new CancellationToken();
-
-
-
                 using (var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port))
                 {
                     await ftp.Connect(token);
-                    await ftp.DownloadDirectory(fullPath, serviceName + "//" + actionPath, token: token);
+                    await ftp.DownloadDirectory(fullPath, Path.Combine(serviceName, actionPath), token: token);
                 }
 
-
                 ZipFile.CreateFromDirectory(fullPath, zipTempFilePath);
-
 
                 var filesDir = Path.Combine(fullPath, serviceName, actionName);
                 var files = Directory.GetFiles(filesDir);
@@ -116,7 +115,7 @@ namespace FTPServiceLibrary.Helpers
                 var token = new CancellationToken();
                 using AsyncFtpClient ftp = new(cfg.Url, cfg.Login, cfg.Password, cfg.Port);
                 await ftp.Connect(token);
-                await ftp.DeleteFile(serviceName + "//" + actionPath + "//" + fileName, token: token);
+                await ftp.DeleteFile(Path.Combine(serviceName, actionPath, fileName), token: token);
             }
             catch (Exception e)
             {
@@ -131,7 +130,7 @@ namespace FTPServiceLibrary.Helpers
                 var token = new CancellationToken();
                 using var ftp = new AsyncFtpClient(cfg.Url, cfg.Login, cfg.Password, cfg.Port);
                 await ftp.Connect(token);
-                await ftp.DeleteDirectory(serviceName + "//" + actionPath, token: token);
+                await ftp.DeleteDirectory(Path.Combine(serviceName, actionPath), token: token);
             }
             catch (Exception e)
             {

@@ -45,28 +45,28 @@ namespace Configuration.Data
             modelBuilder.Entity<FTPConfigurationDbModel>().HasIndex(u => u.ServiceId).IsUnique();
 
             modelBuilder.Entity<ServicesPermisionsDbModel>()
-               .HasOne<FTPConfigurationDbModel>(x => x.Configuration)
+               .HasOne(x => x.Configuration)
                .WithOne(y => y.ServicesPermisions)
                .HasForeignKey<FTPConfigurationDbModel>(x => x.ServiceId)
                .OnDelete(DeleteBehavior.Cascade);
 
             //one to many
-            modelBuilder.Entity<ServiceActionDbModel>()
-             .HasOne<ServicesPermisionsDbModel>(x => x.ServicesPermisions)
+            _ = modelBuilder.Entity<ServiceActionDbModel>()
+             .HasOne(x => x.ServicesPermisions)
              .WithMany(y => y.ServicesActions)
              .HasForeignKey(x => x.ServiceId)
              .OnDelete(DeleteBehavior.Cascade);
 
 
-            modelBuilder.Entity<FilesDbModel>()
-             .HasOne<ServiceActionDbModel>(x => x.ServiceAction)
+            modelBuilder.Entity<FileDbModel>()
+             .HasOne(x => x.ServiceAction)
              .WithMany(y => y.Files)
              .HasForeignKey(x => x.ServiceActionId)
              .OnDelete(DeleteBehavior.Cascade);
         }
 
         public virtual DbSet<ServicesPermisionsDbModel> ServicesPermisions { get; set; }
-        public virtual DbSet<FilesDbModel> FtpFiles { get; set; }
+        public virtual DbSet<FileDbModel> FtpFiles { get; set; }
         public virtual DbSet<ServiceActionDbModel> FtpServicesActions { get; set; }
         public virtual DbSet<FTPConfigurationDbModel> FtpConfigurations { get; set; }
     }

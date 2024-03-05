@@ -57,7 +57,7 @@ app.MapGet("/GetFileAsync", filesWebController.GetFileAsync)
     .WithOpenApi();
 
 app.MapGet("/GetAllActionFilesInZipFile", filesWebController.GetAllActionFilesInZipFile)
-    .WithDescription("Pobieranie wszytskich plików akcji w formie zip")
+    .WithDescription("Pobieranie wszystkich plików akcji w formie archiwum zip")
     .WithOpenApi();
 
 app.MapPost("/SendFilesAsync", filesWebController.SendFilesAsync)
@@ -70,7 +70,7 @@ app.MapDelete("/DeleteFileAsync", filesWebController.DeleteFileAsync)
     .WithOpenApi();
 
 app.MapDelete("/DeleteAllActionsFilesAsync", filesWebController.DeleteAllActionsFilesAsync)
-    .WithDescription("Usuwanie wszytskich plików akcji")
+    .WithDescription("Usuwanie wszystkich plików akcji")
     .WithOpenApi();
 
 

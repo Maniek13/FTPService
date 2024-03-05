@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FTPServiceLibrary.Models.DbModels
 {
-    public record FilesDbModel : IFilesDbModel
+    public record FileDbModel : IFilesDbModel
     {
         [Key]
         public int Id { get; set; }

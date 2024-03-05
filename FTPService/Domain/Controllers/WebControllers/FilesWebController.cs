@@ -15,29 +15,30 @@ namespace Domain.Controllers.WebControllers
         readonly IMapper _mapper = mapper;
         readonly IFTPRODbController _ftpRODbController = fTPRODbController;
         readonly IFTPDbController _ftpDbController = fTPDbController;
-
+        readonly SemaphoreSlim _semaphore = new(1, 1);
         public async Task<IResponseModel<bool>> SendFilesAsync(string serviceName, string actionName, [FromForm] IFormFileCollection files, HttpContext context)
         {
             try
             {
-
                 ValidationHelper.ValidateServiceName(serviceName);
                 ValidationHelper.ValidateActionName(actionName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
-                var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
-
-
-                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
+                var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("Brak konfiguracji");
+                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName) ?? throw new Exception($"Serwis nie posiada akcji: {actionName}");
 
                 for (int i = 0; i < files.Count; ++i)
                 {
+                    await _semaphore.WaitAsync();
                     await FTPHelper.SendFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, files[i]);
 
-                    var file = new FilesDbModel()
+                    if (_ftpRODbController.GetFile(action.Id, files[i].FileName) != null)
+                        break;
+
+                    var file = new FileDbModel()
                     {
                         ServiceActionId = action.Id,
                         Name = files[i].FileName,
-                        Path = serviceName + "//" + action.Path + "//" + files[i].FileName,
+                        Path = Path.Combine(serviceName, action.Path, files[i].FileName)
                     };
 
                     await _ftpDbController.AddFile(file);
@@ -58,39 +59,44 @@ namespace Domain.Controllers.WebControllers
                     Message = ex.Message,
                 };
             }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
         public async Task<IResult> GetAllActionFilesInZipFile(string serviceName, string actionName, HttpContext context)
         {
+            string pathToZipFile = string.Empty, pathToDir = string.Empty;
             try
             {
                 ValidationHelper.ValidateServiceName(serviceName);
                 ValidationHelper.ValidateActionName(actionName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
-                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
-                var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
+                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName) ?? throw new Exception($"Serwis nie posiada akcji: {actionName}");
+                var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("Brak konfiguracji");
 
-                var filesInActionName = _ftpRODbController.GetActionFiles(action.Id);
                 string uniqeId = Guid.NewGuid().ToString();
-                var pathToZipFile = await FTPHelper.GetPathToZipArchiweWithActionDirectoryFiles(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, action.ActionName, uniqeId);
+                pathToZipFile = await FTPHelper.CreateZipArchiveWithActionDirectoryFiles(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, action.ActionName, uniqeId);
 
                 var bytes = File.ReadAllBytes(pathToZipFile);
                 var fileName = $"{actionName}.zip";
-                var pathToDir = pathToZipFile.Replace(fileName, "");
-                File.Delete(pathToZipFile);
-                Directory.Delete(pathToDir);
-
+                pathToDir = pathToZipFile.Replace(fileName, string.Empty);
 
                 return Results.File(bytes, null, fileName);
-
             }
             catch (Exception ex)
             {
                 _logger.LogError($"{GetType()} : {ex.Message}");
                 return Results.NotFound(ex.Message);
             }
+            finally
+            {
+                if(string.IsNullOrEmpty(pathToZipFile))
+                    File.Delete(pathToZipFile);
+                if (string.IsNullOrEmpty(pathToDir))
+                    Directory.Delete(pathToDir);
+            }
         }
-
-
         public async Task<IResult> GetFileAsync(string serviceName, int id, HttpContext context)
         {
             try
@@ -99,8 +105,8 @@ namespace Domain.Controllers.WebControllers
                 if (id <= 0)
                     throw new Exception("Plik musi mieć id większe od zera");
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
-                var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
-                var file = _ftpRODbController.GetFile(id);
+                var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("Brak konfiguracji");
+                var file = _ftpRODbController.GetFile(id) ?? throw new Exception($"Brak pliku o id: {id}");
                 var action = _ftpRODbController.GetServiceAction(file.ServiceActionId);
 
                 var fileToDownload = await FTPHelper.GetFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path, file.Name);
@@ -120,10 +126,8 @@ namespace Domain.Controllers.WebControllers
                 ValidationHelper.ValidateServiceName(serviceName);
                 ValidationHelper.ValidateActionName(actionName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
-                var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
-                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
-
-
+                var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("Brak konfiguracji");
+                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName) ?? throw new Exception($"Serwis nie posiada akcji: {actionName}");
 
 
                 await FTPHelper.DeleteDirectory(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, action.Path);
@@ -132,7 +136,7 @@ namespace Domain.Controllers.WebControllers
 
                 for (int i = 0; i < files.Count; ++i)
                 {
-                    _ftpDbController.DeleteFile(files[i].Id);
+                    await _ftpDbController.DeleteFile(files[i].Id);
                 }
 
                 return new ResponseModel<bool>()
@@ -151,7 +155,6 @@ namespace Domain.Controllers.WebControllers
                 };
             }
         }
-
         public async Task<IResponseModel<bool>> DeleteFileAsync(string serviceName, string actionName, string fileName, HttpContext context)
         {
             try
@@ -160,8 +163,8 @@ namespace Domain.Controllers.WebControllers
                 ValidationHelper.ValidateActionName(actionName);
                 ValidationHelper.ValidateFileName(fileName);
                 var permisions = _ftpRODbController.GetPermision(serviceName) ?? throw new Exception("Serwis nie posiada pozwolenia");
-                var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("brak konfiguracji");
-                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName);
+                var cfg = _ftpRODbController.GetFTPConfiguration(permisions.Id) ?? throw new Exception("Brak konfiguracji");
+                var action = _ftpRODbController.GetServiceAction(permisions.Id, actionName) ?? throw new Exception($"Serwis nie posiada akcji: {actionName}");
 
                 await FTPHelper.DeleteFile(_mapper.Map<FTPConfigurationModel>(cfg), serviceName, actionName, fileName);
                 await _ftpDbController.DeleteFile(action.Id, fileName);

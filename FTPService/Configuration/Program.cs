@@ -26,11 +26,9 @@ var mapperConfig = new MapperConfiguration(mc =>
 });
 IMapper mapper = mapperConfig.CreateMapper();
 
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSqlServer<FTPServiceContextBase>(AppConfig.ConnectionString);
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(o =>
     {
@@ -42,7 +40,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
-
 if (app.Environment.IsDevelopment())
 {
     using (var scope = app.Services.CreateScope())
@@ -50,15 +47,12 @@ if (app.Environment.IsDevelopment())
         var db = scope.ServiceProvider.GetRequiredService<FTPServiceContextBase>();
         db.Database.Migrate();
     }
-
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
-
 
 ConfigurationWebController configurationWebController = new(mapper, app.Logger, new FTPRODbController(), new FTPDbController());
 app.MapGet("/GetConfiguration", configurationWebController.GetConfiguration)
@@ -78,7 +72,7 @@ app.MapDelete("/DeleteConfigurationAsync", configurationWebController.DeleteConf
     .WithOpenApi();
 
 app.MapGet("/GetActionsFolders", configurationWebController.GetActionsFolders)
-    .WithDescription("Get action folder")
+    .WithDescription("Get action folders")
     .WithOpenApi();
 
 app.MapPost("/AddActionFolderAsync", configurationWebController.AddActionFolderAsync)

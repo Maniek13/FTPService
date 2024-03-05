@@ -14,6 +14,6 @@ namespace FTPServiceLibrary.Models.DbModels
         string Path { get; set; }
         ServicesPermisionsDbModel ServicesPermisions { get; set; }
 
-        ICollection<FilesDbModel> Files { get; set; }
+        ICollection<FileDbModel> Files { get; set; }
     }
 }
