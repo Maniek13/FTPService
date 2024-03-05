@@ -68,7 +68,6 @@ namespace FTPServiceLibrary.Helpers
                 Directory.Delete(tempDirPath);
             }
         }
-
         public static async Task<string> CreateZipArchiveWithActionDirectoryFiles(IFTPConfigurationModel cfg, string serviceName, string actionPath, string actionName)
         {
             string uniqueId = Guid.NewGuid().ToString();
@@ -102,36 +101,6 @@ namespace FTPServiceLibrary.Helpers
                     DeletingFilesAndParentFolders(ref fullDirPath, tempDirPath);
             }
         }
-        private static void DeletingFilesAndParentFolders(ref string fullDirPath, string tempDirPath)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(fullDirPath) || string.IsNullOrWhiteSpace(tempDirPath))
-                    throw new Exception($"Nazwy ścieżek nie mogą być puste. Pełna ścieżka: {fullDirPath}, ścieżka tymczasowa: {tempDirPath}");
-
-                if(tempDirPath == fullDirPath)
-                {
-                    Directory.Delete(tempDirPath);
-                    fullDirPath = string.Empty;
-                    return;
-                }
-
-                var files = Directory.GetFiles(fullDirPath);
-
-                if (files != null)
-                    for (int i = 0; i < files.Length; ++i)
-                        File.Delete(files[i]);
-                Directory.Delete(fullDirPath);
-
-                fullDirPath = Directory.GetParent(fullDirPath).FullName;
-
-                DeletingFilesAndParentFolders(ref fullDirPath, tempDirPath);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
-        }
         public static async Task DeleteFile(IFTPConfigurationModel cfg, string serviceName, string actionPath, string fileName)
         {
             try
@@ -146,7 +115,6 @@ namespace FTPServiceLibrary.Helpers
                 throw new Exception(e.Message, e);
             }
         }
-
         public static async Task DeleteDirectory(IFTPConfigurationModel cfg, string serviceName, string actionPath)
         {
             try
@@ -161,6 +129,34 @@ namespace FTPServiceLibrary.Helpers
                 throw new Exception(e.Message, e);
             }
         }
+        private static void DeletingFilesAndParentFolders(ref string fullDirPath, string tempDirPath)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(fullDirPath) || string.IsNullOrWhiteSpace(tempDirPath))
+                    throw new Exception($"Nazwy ścieżek nie mogą być puste. Pełna ścieżka: {fullDirPath}, ścieżka tymczasowa: {tempDirPath}");
 
+                if (tempDirPath == fullDirPath)
+                {
+                    Directory.Delete(tempDirPath);
+                    fullDirPath = string.Empty;
+                    return;
+                }
+
+                var files = Directory.GetFiles(fullDirPath);
+                if (files != null)
+                    for (int i = 0; i < files.Length; ++i)
+                        File.Delete(files[i]);
+                Directory.Delete(fullDirPath);
+
+                fullDirPath = Directory.GetParent(fullDirPath).FullName;
+
+                DeletingFilesAndParentFolders(ref fullDirPath, tempDirPath);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
     }
 }
