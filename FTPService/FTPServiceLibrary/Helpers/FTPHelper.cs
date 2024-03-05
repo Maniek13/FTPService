@@ -1,7 +1,9 @@
 ﻿using FluentFTP;
 using FTPServiceLibrary.Interfaces.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using System.IO.Compression;
+using System.Text;
 
 namespace FTPServiceLibrary.Helpers
 {
@@ -95,7 +97,7 @@ namespace FTPServiceLibrary.Helpers
             }
             finally
             {
-                if (!string.IsNullOrEmpty(fullDirPath) && fullDirPath.StartsWith(tempDirPath))
+                if (!string.IsNullOrEmpty(fullDirPath))
                     GarbageCollectionOfTempDirPath(ref fullDirPath, tempDirPath);
             }
         }
@@ -127,51 +129,46 @@ namespace FTPServiceLibrary.Helpers
                 throw new Exception(e.Message, e);
             }
         }
-        private static void GarbageCollectionOfTempDirPath(ref string fullDirPath, string tempDirPath)
+
+        private static void GarbageCollectionOfTempDirPath(ref string actualFolderPath, string tempDirPath)
         {
             try
             {
-                if (!fullDirPath.StartsWith(tempDirPath))
-                    throw new Exception($"Pełna ścieżka ({fullDirPath}), musi zaczynać się od tymczasowej ścieżki: ({tempDirPath})");
+                if (!actualFolderPath.StartsWith(tempDirPath))
+                    throw new Exception($"Aktualna ścieżka ({actualFolderPath}), musi zaczynać się od tymczasowej ścieżki: ({tempDirPath})");
 
-                if (string.IsNullOrWhiteSpace(fullDirPath) || string.IsNullOrWhiteSpace(tempDirPath))
-                    throw new Exception($"Nazwy ścieżek nie mogą być puste. Pełna ścieżka: {fullDirPath}, ścieżka tymczasowa: {tempDirPath}");
+                if (string.IsNullOrWhiteSpace(actualFolderPath) || string.IsNullOrWhiteSpace(tempDirPath))
+                    throw new Exception($"Nazwy ścieżek nie mogą być puste. Aktualna ścieżka: {actualFolderPath}, ścieżka tymczasowa: {tempDirPath}");
 
-                if (tempDirPath == fullDirPath)
-                {
-                    Directory.Delete(tempDirPath);
-                    fullDirPath = string.Empty;
-                    return;
-                }
-
-                var files = Directory.GetFiles(fullDirPath);
+                var files = Directory.GetFiles(actualFolderPath);
                 if (files != null)
                     for (int i = 0; i < files.Length; ++i)
                         File.Delete(files[i]);
 
-                var subDirectorys = Directory.GetDirectories(fullDirPath);
+                var subDirectorys = Directory.GetDirectories(actualFolderPath);
 
                 if(subDirectorys.Count() != 0)
                 {
-                    fullDirPath = subDirectorys[0];
-                    GarbageCollectionOfTempDirPath(ref fullDirPath, tempDirPath);
+                    actualFolderPath = subDirectorys[0];
+                    GarbageCollectionOfTempDirPath(ref actualFolderPath, tempDirPath);
                 }
 
-                if (tempDirPath == fullDirPath)
+                if (tempDirPath == actualFolderPath)
                 {
                     Directory.Delete(tempDirPath);
-                    fullDirPath = string.Empty;
-                    return;
+                    actualFolderPath = string.Empty;
                 }
 
-                Directory.Delete(fullDirPath);
+                else if (!string.IsNullOrWhiteSpace(actualFolderPath))
+                {
+                    Directory.Delete(actualFolderPath);
+                    var parent = Directory.GetParent(actualFolderPath) ?? throw new Exception("Usuwanie śmieci, brak podkatalogu. Coś poszło nie tak, spróbuj ponownie.");
 
-                var parent = Directory.GetParent(fullDirPath) ?? throw new Exception("Usuwanie śmieci, brak podkatalogu. Coś poszło nie tak, spróbuj ponownie.");
+                    if (parent != null)
+                        actualFolderPath = parent.FullName;
 
-                if(parent != null )
-                    fullDirPath = parent.FullName;
-
-                GarbageCollectionOfTempDirPath(ref fullDirPath, tempDirPath);
+                    GarbageCollectionOfTempDirPath(ref actualFolderPath, tempDirPath);
+                }
             }
             catch (Exception ex)
             {
