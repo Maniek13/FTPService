@@ -1,9 +1,7 @@
 ﻿using FluentFTP;
 using FTPServiceLibrary.Interfaces.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Tokens;
 using System.IO.Compression;
-using System.Text;
 
 namespace FTPServiceLibrary.Helpers
 {
@@ -87,7 +85,7 @@ namespace FTPServiceLibrary.Helpers
                 }
                 ZipFile.CreateFromDirectory(fullDirPath, zipTempFilePath);
 
-                GarbageCollectionOfTempDirPath(ref fullDirPath, tempDirPath);
+                DeleteDirectoryWithItsContent(ref fullDirPath, tempDirPath);
 
                 return zipTempFilePath;
             }
@@ -98,7 +96,7 @@ namespace FTPServiceLibrary.Helpers
             finally
             {
                 if (!string.IsNullOrWhiteSpace(fullDirPath) && fullDirPath.StartsWith(tempDirPath))
-                    GarbageCollectionOfTempDirPath(ref fullDirPath, tempDirPath);
+                    DeleteDirectoryWithItsContent(ref fullDirPath, tempDirPath);
             }
         }
         public static async Task DeleteFile(IFTPConfigurationModel cfg, string serviceName, string actionPath, string fileName)
@@ -130,44 +128,43 @@ namespace FTPServiceLibrary.Helpers
             }
         }
 
-        private static void GarbageCollectionOfTempDirPath(ref string actualFolderPath, string tempDirPath)
+        private static void DeleteDirectoryWithItsContent(ref string actualDirectoryPath, string directoryPath)
         {
             try
             {
-                if (!actualFolderPath.StartsWith(tempDirPath))
-                    throw new Exception($"Aktualna ścieżka ({actualFolderPath}), musi zaczynać się od tymczasowej ścieżki: ({tempDirPath})");
+                if (!actualDirectoryPath.StartsWith(directoryPath))
+                    throw new Exception($"Aktualna ścieżka ({actualDirectoryPath}), musi zaczynać się od tymczasowej ścieżki: ({directoryPath})");
 
-                if (string.IsNullOrWhiteSpace(actualFolderPath) || string.IsNullOrWhiteSpace(tempDirPath))
-                    throw new Exception($"Nazwy ścieżek nie mogą być puste. Aktualna ścieżka: {actualFolderPath}, ścieżka tymczasowa: {tempDirPath}");
+                if (string.IsNullOrWhiteSpace(actualDirectoryPath) || string.IsNullOrWhiteSpace(directoryPath))
+                    throw new Exception($"Nazwy ścieżek nie mogą być puste. Aktualna ścieżka: {actualDirectoryPath}, ścieżka tymczasowa: {directoryPath}");
 
-                var files = Directory.GetFiles(actualFolderPath);
+                var files = Directory.GetFiles(actualDirectoryPath);
                 if (files != null)
                     for (int i = 0; i < files.Length; ++i)
                         File.Delete(files[i]);
 
-                var subDirectorys = Directory.GetDirectories(actualFolderPath);
+                var subDirectorys = Directory.GetDirectories(actualDirectoryPath);
 
-                if(subDirectorys.Count() != 0)
+                if (subDirectorys.Count() != 0)
                 {
-                    actualFolderPath = subDirectorys[0];
-                    GarbageCollectionOfTempDirPath(ref actualFolderPath, tempDirPath);
+                    actualDirectoryPath = subDirectorys[0];
+                    DeleteDirectoryWithItsContent(ref actualDirectoryPath, directoryPath);
                 }
 
-                if (tempDirPath == actualFolderPath)
+                if (directoryPath == actualDirectoryPath)
                 {
-                    Directory.Delete(tempDirPath);
-                    actualFolderPath = string.Empty;
+                    Directory.Delete(directoryPath);
+                    actualDirectoryPath = string.Empty;
                 }
-
-                else if (!string.IsNullOrWhiteSpace(actualFolderPath))
+                else if (!string.IsNullOrWhiteSpace(actualDirectoryPath))
                 {
-                    Directory.Delete(actualFolderPath);
-                    var parent = Directory.GetParent(actualFolderPath) ?? throw new Exception("Usuwanie śmieci, brak podkatalogu. Coś poszło nie tak, spróbuj ponownie.");
+                    Directory.Delete(actualDirectoryPath);
+                    var parent = Directory.GetParent(actualDirectoryPath) ?? throw new Exception("Usuwanie śmieci, brak podkatalogu. Coś poszło nie tak, spróbuj ponownie.");
 
                     if (parent != null)
-                        actualFolderPath = parent.FullName;
+                        actualDirectoryPath = parent.FullName;
 
-                    GarbageCollectionOfTempDirPath(ref actualFolderPath, tempDirPath);
+                    DeleteDirectoryWithItsContent(ref actualDirectoryPath, directoryPath);
                 }
             }
             catch (Exception ex)
