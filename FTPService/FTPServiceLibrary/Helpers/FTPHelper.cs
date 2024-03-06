@@ -32,8 +32,7 @@ namespace FTPServiceLibrary.Helpers
             }
             finally
             {
-                File.Delete(fileFullPath);
-                Directory.Delete(tempDirPath);
+                Directory.Delete(tempDirPath, true);
             }
         }
         public static async Task<byte[]> GetFile(IFTPConfigurationModel cfg, string serviceName, string actionPath, string fileName)
@@ -53,7 +52,6 @@ namespace FTPServiceLibrary.Helpers
                     await ftp.DownloadFile(fileFullPath, Path.Combine(serviceName, actionPath, fileName), token: token);
                     file = File.ReadAllBytes(fileFullPath);
                 }
-
                 return file;
             }
             catch (Exception e)
@@ -62,8 +60,7 @@ namespace FTPServiceLibrary.Helpers
             }
             finally
             {
-                File.Delete(fileFullPath);
-                Directory.Delete(tempDirPath);
+                Directory.Delete(tempDirPath, true);
             }
         }
         public static async Task<string> CreateZipArchiveWithActionDirectoryFiles(IFTPConfigurationModel cfg, string serviceName, string actionPath, string actionName)
@@ -85,8 +82,6 @@ namespace FTPServiceLibrary.Helpers
                 }
                 ZipFile.CreateFromDirectory(fullDirPath, zipTempFilePath);
 
-                DeleteDirectoryWithItsContent(ref fullDirPath, tempDirPath);
-
                 return zipTempFilePath;
             }
             catch (Exception e)
@@ -95,8 +90,8 @@ namespace FTPServiceLibrary.Helpers
             }
             finally
             {
-                if (!string.IsNullOrWhiteSpace(fullDirPath) && fullDirPath.StartsWith(tempDirPath))
-                    DeleteDirectoryWithItsContent(ref fullDirPath, tempDirPath);
+                if(Directory.Exists(tempDirPath))
+                    Directory.Delete(tempDirPath, true);
             }
         }
         public static async Task DeleteFile(IFTPConfigurationModel cfg, string serviceName, string actionPath, string fileName)
@@ -125,51 +120,6 @@ namespace FTPServiceLibrary.Helpers
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        private static void DeleteDirectoryWithItsContent(ref string actualDirectoryPath, string directoryPath)
-        {
-            try
-            {
-                if (!actualDirectoryPath.StartsWith(directoryPath))
-                    throw new Exception($"Aktualna ścieżka ({actualDirectoryPath}), musi zaczynać się od tymczasowej ścieżki: ({directoryPath})");
-
-                if (string.IsNullOrWhiteSpace(actualDirectoryPath) || string.IsNullOrWhiteSpace(directoryPath))
-                    throw new Exception($"Nazwy ścieżek nie mogą być puste. Aktualna ścieżka: {actualDirectoryPath}, ścieżka tymczasowa: {directoryPath}");
-
-                var files = Directory.GetFiles(actualDirectoryPath);
-                if (files != null)
-                    for (int i = 0; i < files.Length; ++i)
-                        File.Delete(files[i]);
-
-                var subDirectorys = Directory.GetDirectories(actualDirectoryPath);
-
-                if (subDirectorys.Count() != 0)
-                {
-                    actualDirectoryPath = subDirectorys[0];
-                    DeleteDirectoryWithItsContent(ref actualDirectoryPath, directoryPath);
-                }
-
-                if (directoryPath == actualDirectoryPath)
-                {
-                    Directory.Delete(directoryPath);
-                    actualDirectoryPath = string.Empty;
-                }
-                else if (!string.IsNullOrWhiteSpace(actualDirectoryPath))
-                {
-                    Directory.Delete(actualDirectoryPath);
-                    var parent = Directory.GetParent(actualDirectoryPath) ?? throw new Exception("Usuwanie śmieci, brak podkatalogu. Coś poszło nie tak, spróbuj ponownie.");
-
-                    if (parent != null)
-                        actualDirectoryPath = parent.FullName;
-
-                    DeleteDirectoryWithItsContent(ref actualDirectoryPath, directoryPath);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
             }
         }
     }
