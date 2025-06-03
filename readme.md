@@ -1,3 +1,5 @@
+W razie chęci wykorzystania, proszę o kontakt
+
 Konfiguracja:
 
 - żeby wysyłac pliki, trzeba ustawić folder akcji dla aplikacji, to jest ścieżkę do plików. Można mieć kilka folderów.
